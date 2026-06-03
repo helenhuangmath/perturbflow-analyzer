@@ -18,4 +18,4 @@ source /vast/parcc/spack/sw/apps/linux-sapphirerapids/anaconda3-2023.09-0-ieilyr
 conda activate "${ENV_DIR}"
 
 cd "${CODE_DIR}"
-"${ENV_DIR}/bin/python" write_plotly_smoke_test.py
+"${ENV_DIR}/bin/python" write_plotly_test.py

@@ -32,12 +32,12 @@ def test_agent_handoff_writes_expected_files(tmp_path: Path) -> None:
         encoding="utf-8",
     )
 
-    files = write_agent_handoff(results, project_name="Smoke test")
+    files = write_agent_handoff(results, project_name="Test")
 
     assert Path(files["interpretation_context"]).exists()
     assert Path(files["agent_prompt"]).exists()
     assert Path(files["machine_context"]).exists()
     assert Path(files["agent_manifest"]).exists()
     text = Path(files["interpretation_context"]).read_text(encoding="utf-8")
-    assert "Smoke test interpretation context" in text
+    assert "Test interpretation context" in text
     assert "GENE1" in text

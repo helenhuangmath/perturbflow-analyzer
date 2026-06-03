@@ -13,7 +13,7 @@ describes:
 The companion document [`METHOD.md`](METHOD.md) describes the algorithms
 and parameters; this document is purely about **interpretation**. All
 file paths below are relative to a run's output directory (e.g.
-`results_smoke/`).
+`results_test/`).
 
 The pipeline writes three top-level subfolders:
 

@@ -3,7 +3,7 @@
 Suggested repository name:
 
 ```text
-PerturbFlow
+perturbflow-analyzer
 ```
 
 Suggested first workflow:

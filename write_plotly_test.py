@@ -8,7 +8,7 @@ out.write_text(
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Plotly Smoke Test</title>
+  <title>Plotly Test</title>
   <style>
     body{font-family:Arial,sans-serif;margin:32px;background:#f8fafc;color:#102033}
     #status{padding:10px 12px;border:2px solid #1f4e79;background:#eef7ff;margin-bottom:16px;font:13px/1.45 monospace}
@@ -16,7 +16,7 @@ out.write_text(
   </style>
 </head>
 <body>
-  <h1>Plotly Smoke Test</h1>
+  <h1>Plotly Test</h1>
   <div id="status">Starting...</div>
   <div id="chart"></div>
   <script src="plotly.min.js"></script>

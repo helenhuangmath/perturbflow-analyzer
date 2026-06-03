@@ -23,9 +23,9 @@ set -euo pipefail
 
 CODE_DIR="/vast/projects/wherry/foundation-models-immuno/hhua/sc_perturbation/PerturbScope_v1"
 ENV_DIR="/vast/projects/wherry/foundation-models-immuno/hhua/tools/perturbscope_env"
-RESULTS_DIR="${CODE_DIR}/results_smoke"
+RESULTS_DIR="${CODE_DIR}/results_test"
 INPUT_H5AD="${RESULTS_DIR}/final_adata.h5ad"
-CONFIG_JSON="${CODE_DIR}/configs/smoke_test.json"
+CONFIG_JSON="${CODE_DIR}/configs/test.json"
 
 export MPLCONFIGDIR="${TMPDIR:-/tmp}/matplotlib-${SLURM_JOB_ID:-local}"
 export XDG_CACHE_HOME="${TMPDIR:-/tmp}/xdg-cache-${SLURM_JOB_ID:-local}"
@@ -52,7 +52,7 @@ sys.path.insert(0, "/vast/projects/wherry/foundation-models-immuno/hhua/sc_pertu
 import anndata
 from perturbscope.interactive import build_interactive_report
 
-results_dir = "/vast/projects/wherry/foundation-models-immuno/hhua/sc_perturbation/PerturbScope_v1/results_smoke"
+results_dir = "/vast/projects/wherry/foundation-models-immuno/hhua/sc_perturbation/PerturbScope_v1/results_test"
 h5ad_path   = results_dir + "/final_adata.h5ad"
 
 print(f"Loading {h5ad_path} ...")

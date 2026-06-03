@@ -15,8 +15,8 @@ The current implementation wraps the proven PerturbScope analysis engine and add
 ## Install
 
 ```bash
-git clone https://github.com/YOUR_ORG/PerturbFlow.git
-cd PerturbFlow
+git clone https://github.com/YOUR_ORG/perturbflow-analyzer.git
+cd perturbflow-analyzer
 python -m pip install -e ".[bundle]"
 ```
 
@@ -122,10 +122,10 @@ perturbflow run --input prepared/my_data.perturbflow.h5ad --output results/my_ru
 ## Repository Layout
 
 ```text
-PerturbFlow/
+perturbflow-analyzer/
 ├── perturbflow/          # Public workflow, CLI, and AI/agent handoff
 ├── perturbscope/         # Analysis engine
-├── configs/              # Default and smoke-test pipeline configs
+├── configs/              # Default and test pipeline configs
 ├── scripts/              # Companion scripts, including Seurat/Mixscape
 ├── docs/                 # MkDocs documentation site
 ├── README.md

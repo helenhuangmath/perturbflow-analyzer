@@ -23,7 +23,7 @@ its own module under `perturbscope/`.
 **Public entry point:** `run_gene_network(adata, output_dir, perturbations, n_top_genes, n_gene_clusters, corr_threshold)`
 **Pipeline call site:** [`perturbscope/pipeline.py:204-217`](perturbscope/pipeline.py#L204-L217)
 **Step name (for `--steps` / `default_steps`):** `genenet`
-**Smoke-test config:** `genenet_n_top_genes=30`, `genenet_n_gene_clusters=4`, `genenet_corr_threshold=0.4` (see [`configs/smoke_test.json`](configs/smoke_test.json)).
+**Test config:** `genenet_n_top_genes=30`, `genenet_n_gene_clusters=4`, `genenet_corr_threshold=0.4` (see [`configs/test.json`](configs/test.json)).
 
 ### 1. Inputs and assumptions
 
@@ -33,7 +33,7 @@ its own module under `perturbscope/`.
 | `adata.obs["perturbation"]` | string column | One row per cell; `control` is reserved for the unperturbed pool. |
 | `adata.obs["is_control"]` | boolean | Set by `qc` / `preprocess`. Identifies the cells used as the control pool. |
 | `adata.var["highly_variable"]` | boolean (optional) | If present, the gene panel is taken from this flag; otherwise we fall back to top variance over control cells (see §2). |
-| `top_perts` (parameter) | from [`identify_top_perturbations`](perturbscope/perturbation.py) | The `n_top` perturbations ranked by the `effects` step's effect-size table. The smoke run uses `deg_n_top_perturbations = 3`. |
+| `top_perts` (parameter) | from [`identify_top_perturbations`](perturbscope/perturbation.py) | The `n_top` perturbations ranked by the `effects` step's effect-size table. The test run uses `deg_n_top_perturbations = 3`. |
 
 The GRN step requires **≥ 5 control cells and ≥ 5 cells per perturbation**; smaller groups are skipped with no error.
 
@@ -51,7 +51,7 @@ else:
 gene_names = adata.var_names[hv_idx].tolist()    # length = n_top_genes
 ```
 
-* `n_top_genes` is the only knob; default `50`, smoke-test value `30`.
+* `n_top_genes` is the only knob; default `50`, test value `30`.
 * The fallback branch ranks genes by variance computed **on control cells only**, not on the full pool, so the panel is not biased by any single perturbation.
 * If `n_top_genes` exceeds `n_vars`, all genes are kept; if `< 4` genes survive, the step exits early.
 
@@ -72,7 +72,7 @@ cluster_labels = fcluster(Z, t=n_gene_clusters,
 ```
 
 * Distance is `1 − |r|`, so positively- and negatively-correlated genes are placed in the same module (we treat sign as orientation, not similarity).
-* Linkage is **average** (UPGMA). `n_gene_clusters` is the only knob; default `5`, smoke-test `4`.
+* Linkage is **average** (UPGMA). `n_gene_clusters` is the only knob; default `5`, test `4`.
 * Cluster IDs are written to `csv/genenet_gene_clusters.csv` together with mean expression columns per perturbation and per-perturbation log₂ fold-changes (added inside the for-pert loop).
 
 ### 4. Edges — thresholded Pearson correlation per condition
@@ -194,7 +194,7 @@ The interactive report ([`perturbscope/interactive.py`](perturbscope/interactive
 
 ### 9. Parameters and defaults
 
-| Config key (JSON)             | Default | Smoke | Description |
+| Config key (JSON)             | Default | Test | Description |
 |-------------------------------|--------:|------:|-------------|
 | `genenet_n_top_genes`         |      50 |    30 | Number of HVGs (or top-variance-on-control fallback) included as nodes. |
 | `genenet_n_gene_clusters`     |       5 |     4 | Number of gene modules (`fcluster` `maxclust` cut). |
