@@ -1,0 +1,23 @@
+site_name: PerturbFlow
+site_description: User-friendly Perturb-seq analysis and AI-agent interpretation handoff
+repo_url: https://github.com/YOUR_ORG/PerturbFlow
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - content.code.copy
+nav:
+  - Home: index.md
+  - Quick Start: quickstart.md
+  - Data Input: data-input.md
+  - Analysis Workflow: workflow.md
+  - AI And Agents: ai-agents.md
+  - Outputs: outputs.md
+  - Methods: methods.md
+  - GitHub Setup: github.md
+markdown_extensions:
+  - admonition
+  - tables
+  - toc:
+      permalink: true

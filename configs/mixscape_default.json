@@ -1,0 +1,30 @@
+{
+  "assay": "RNA",
+  "perturbation_col": "perturbation",
+  "target_col": null,
+  "guide_col": null,
+  "replicate_col": null,
+  "nt_class": "NT",
+  "control_labels": [
+    "control",
+    "NT",
+    "non-targeting",
+    "nontargeting",
+    "non_targeting",
+    "negative_control"
+  ],
+  "dims": 40,
+  "num_neighbors": 20,
+  "mixscape_min_de_genes": 5,
+  "mixscape_iter_num": 10,
+  "mixscape_prtb_type": "KO",
+  "lda_npcs": 10,
+  "lda_logfc_threshold": 0.25,
+  "top_targets": 12,
+  "max_heatmap_targets": 8,
+  "mixscape_heatmap_max_genes": 20,
+  "mixscape_heatmap_max_cells_group": 300,
+  "save_rds": true,
+  "point_size": 0.2,
+  "seed": 1
+}

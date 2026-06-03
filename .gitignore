@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.bak
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local environments
+.venv/
+venv/
+env/
+.env
+.env.*
+
+# Operating system files
+.DS_Store
+._*
+
+# Generated analysis outputs
+results*/
+logs/
+slurm-*.out
+*.h5ad
+*.h5seurat
+*.rds
+*.loom
+*.mtx
+*.parquet
+
+# Built docs
+site/
+
+# Local scratch
+scratch/
+tmp/
+PerturbFlow/note.txt
