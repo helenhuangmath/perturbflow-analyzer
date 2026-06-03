@@ -126,6 +126,7 @@ perturbflow-analyzer/
 ├── perturbflow/          # Public workflow, CLI, and AI/agent handoff
 ├── perturbscope/         # Analysis engine
 ├── configs/              # Default and test pipeline configs
+├── examples/             # Notebook templates for common workflows
 ├── scripts/              # Companion scripts, including Seurat/Mixscape
 ├── docs/                 # MkDocs documentation site
 ├── README.md
@@ -145,6 +146,15 @@ mkdocs serve
 ```
 
 Then open the local URL printed by MkDocs. The docs structure is inspired by practical package documentation such as Seurat: installation, quick start, data preparation, analysis workflow, interpretation, and examples.
+
+## Example Notebooks
+
+Notebook templates are available in [`examples/`](examples/):
+
+- `01_prepare_and_run.ipynb`: prepare data and run the full pipeline.
+- `02_step_rerun_and_config.ipynb`: customize config and rerun selected steps.
+- `03_interpret_with_agents.ipynb`: create AI/agent-ready interpretation files.
+- `04_explore_outputs.ipynb`: inspect result tables, reports, and bundles.
 
 ## AI And Agent Design
 

@@ -12,6 +12,7 @@ nav:
   - Quick Start: quickstart.md
   - Data Input: data-input.md
   - Analysis Workflow: workflow.md
+  - Examples: examples.md
   - AI And Agents: ai-agents.md
   - Outputs: outputs.md
   - Methods: methods.md
