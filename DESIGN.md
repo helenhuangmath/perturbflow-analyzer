@@ -1,11 +1,11 @@
 # PerturbScope — Synthesized Design
 
-Combines the scientific modules from `tmp_plan_1` and the phased build from `tmp_plan_2` (already partially implemented in [perturbscope/](perturbscope/)) with the bundle + interactive-viewer architecture from `tmp_plan_3`.
+Combines the scientific modules from `tmp_plan_1` and the phased build from `tmp_plan_2` (already partially implemented in [perturbflow/analyzer/](perturbflow/analyzer/)) with the bundle + interactive-viewer architecture from `tmp_plan_3`.
 
 ## Plan evaluation
 
 - **plan_1** defines the science (effective perturbation scoring, dual-level effect decomposition, trajectory, programs, interactions). Adopted as the module catalog.
-- **plan_2** turns those modules into a 9-phase build with concrete code, tests, and CI. Adopted as the build sequence — the current [perturbscope/](perturbscope/) tree already covers Phases 0–7 and a static-HTML Phase 8.
+- **plan_2** turns those modules into a 9-phase build with concrete code, tests, and CI. Adopted as the build sequence — the current [perturbflow/analyzer/](perturbflow/analyzer/) tree already covers Phases 0–7 and a static-HTML Phase 8.
 - **plan_3** addresses the part the other two miss: how the user actually *explores* results — a results-bundle contract plus a static viewer with perturbation, gene, and network pages. Adopted as the delivery architecture.
 
 The user-facing requirements (interactive exploration, per-gene / per-perturbation lookup and comparison, TF and complex networks) are squarely the plan_3 layer. So the right move is **not** to pick one plan but to extend the existing plan_1/2 implementation with a plan_3 viewer.
@@ -16,7 +16,7 @@ The user-facing requirements (interactive exploration, per-gene / per-perturbati
 h5ad
   │
   ▼
-PerturbScope pipeline (existing perturbscope/, Python)
+PerturbScope pipeline (existing perturbflow/analyzer/, Python)
   - ingest → qc → preprocess → score → effects → trajectory → programs → interaction
   │
   ▼
@@ -36,16 +36,16 @@ The pipeline and viewer are decoupled by the bundle schema. Same viewer works fo
 
 ## What's already implemented
 
-From [perturbscope/](perturbscope/) and [pipeline.py](perturbscope/pipeline.py):
+From [perturbflow/analyzer/](perturbflow/analyzer/) and [pipeline.py](perturbflow/analyzer/pipeline.py):
 
 - ingest/QC/preprocess/score/effects/trajectory/programs/interaction modules
-- CLI entry (`perturbscope run`)
-- Static-HTML report ([report.py](perturbscope/report.py))
-- Bundle emitter ([bundle.py](perturbscope/bundle.py)) — parquet + JSON results bundle
-- **EDA module** ([eda.py](perturbscope/eda.py)) — cells-per-group bar chart, cluster
+- CLI entry (`perturbflow run`)
+- Static-HTML report ([report.py](perturbflow/analyzer/report.py))
+- Bundle emitter ([bundle.py](perturbflow/analyzer/bundle.py)) — parquet + JSON results bundle
+- **EDA module** ([eda.py](perturbflow/analyzer/eda.py)) — cells-per-group bar chart, cluster
   proportion stacked bar, gene×cell heatmap, gene×perturbation pseudobulk
   heatmap, gene–gene Pearson correlation heatmap, UMAP by cell-state cluster
-- **DEG module** ([deg.py](perturbscope/deg.py)) — identifies top perturbations, runs
+- **DEG module** ([deg.py](perturbflow/analyzer/deg.py)) — identifies top perturbations, runs
   Welch t-test DEG analysis per perturbation vs control, volcano plots, DEG
   tables (CSV), and a top-perturbations log₂FC summary heatmap
 - SLURM submission scripts
@@ -54,9 +54,9 @@ From [perturbscope/](perturbscope/) and [pipeline.py](perturbscope/pipeline.py):
 
 Two remaining items from the original plan:
 
-### 1. TF / complex network module (extend `perturbscope/programs.py`)
+### 1. TF / complex network module (extend `perturbflow/analyzer/programs.py`)
 
-A new pipeline step `bundle` that runs after `interaction` and writes a typed, versioned results bundle. Inputs: the AnnData and DataFrames already in memory at end of [pipeline.py](perturbscope/pipeline.py). Outputs:
+A new pipeline step `bundle` that runs after `interaction` and writes a typed, versioned results bundle. Inputs: the AnnData and DataFrames already in memory at end of [pipeline.py](perturbflow/analyzer/pipeline.py). Outputs:
 
 | File | Source in current code | Notes |
 |---|---|---|
@@ -75,9 +75,9 @@ A new pipeline step `bundle` that runs after `interaction` and writes a typed, v
 
 Bundle schema is versioned (`schema_version: "1.0"`); viewer reads `manifest.json` first and hides any panel whose artifact is missing — that keeps the same viewer reusable for partial runs.
 
-### 2. TF / complex network module (extend `perturbscope/programs.py`)
+### 2. TF / complex network module (extend `perturbflow/analyzer/programs.py`)
 
-Current [programs.py](perturbscope/programs.py) (3 KB) is light. To support the user's "find TF or complex networks" ask, extend it to emit:
+Current [programs.py](perturbflow/analyzer/programs.py) (3 KB) is light. To support the user's "find TF or complex networks" ask, extend it to emit:
 
 - **TF activity per cell** — DoRothEA/CollecTRI prior × scaled expression (pure Python via [decoupler-py](https://github.com/saezlab/decoupler-py)), stored in `adata.obsm['tf_activity']`.
 - **TF–target edges** for the network panel — TF, target, weight (prior), perturbation_effect (delta TF activity perturbed vs control), serialized as `tf_network.json`.
@@ -85,7 +85,7 @@ Current [programs.py](perturbscope/programs.py) (3 KB) is light. To support the 
 
 This is the only real addition to the science layer; everything else for the user's ask is delivery.
 
-### 3. Static viewer (`viewer/`, separate from `perturbscope/`)
+### 3. Static viewer (`viewer/`, separate from `perturbflow/analyzer/`)
 
 **Recommendation: Quarto for v1.** Reasons matching plan_3: a single command builds the site, Plotly/Observable plots are first-class, GitHub Pages deploy is trivial, days-not-weeks to ship. Move to a Svelte/React frontend with Arrow.js + DuckDB-WASM only if/when interactivity outgrows it (large UMAPs, cross-page state, scale to 10k+ perturbations).
 
@@ -110,10 +110,10 @@ Each phase is one PR-sized chunk. Phases 0–7 of `tmp_plan_2` are already done;
 
 | Phase | Deliverable | New code | Status |
 |---|---|---|---|
-| **A** | Bundle schema + emitter | [bundle.py](perturbscope/bundle.py) | ✅ done |
-| **EDA** | Cells-per-group, 3 heatmaps, cluster proportions, UMAP by cluster | [eda.py](perturbscope/eda.py) | ✅ done |
-| **DEG** | Top-perturbation DEG, volcano plots, summary heatmap | [deg.py](perturbscope/deg.py) | ✅ done |
-| **B** | TF / module / network artifacts | extend [programs.py](perturbscope/programs.py): decoupler TF activity, NMF modules, TF-network JSON serializer | pending |
+| **A** | Bundle schema + emitter | [bundle.py](perturbflow/analyzer/bundle.py) | ✅ done |
+| **EDA** | Cells-per-group, 3 heatmaps, cluster proportions, UMAP by cluster | [eda.py](perturbflow/analyzer/eda.py) | ✅ done |
+| **DEG** | Top-perturbation DEG, volcano plots, summary heatmap | [deg.py](perturbflow/analyzer/deg.py) | ✅ done |
+| **B** | TF / module / network artifacts | extend [programs.py](perturbflow/analyzer/programs.py): decoupler TF activity, NMF modules, TF-network JSON serializer | pending |
 | **C** | Quarto viewer skeleton | `viewer/` with landing, browse-perturbations, perturbation-page (Plotly), reading bundle | pending |
 | **D** | Gene page + search | inverted index in bundle, gene page, FlexSearch wiring | ~2 days |
 | **E** | Network page (Cytoscape.js, subgraph-on-query) | `viewer/network.qmd` + JS | ~2–3 days |
@@ -197,7 +197,7 @@ These are the small forks that change the design downstream — worth picking no
 1. **One bundle per dataset, or one bundle per (dataset, model_version)?** I'd recommend the latter — keeps reproducibility tight and lets the viewer show two runs side-by-side later.
 2. **Quarto vs Streamlit-on-Stlite vs custom Svelte.** Default Quarto unless you already know you need cross-page reactive state.
 3. **Bundle hosting.** Same repo as code, separate `bundles/` repo, or release artifact attached to a GitHub release. Release artifact is the cleanest if bundles get large (>100 MB).
-4. **Network prior source.** CollecTRI for human (default), DoRothEA for legacy mouse work, or both with a switch. Affects [programs.py](perturbscope/programs.py).
+4. **Network prior source.** CollecTRI for human (default), DoRothEA for legacy mouse work, or both with a switch. Affects [programs.py](perturbflow/analyzer/programs.py).
 5. **TF activity scoring method.** decoupler `ulm`/`mlm`/`viper`. `ulm` is fast and the de-facto default; flag if you want viper.
 
 ## What I would not do
@@ -205,4 +205,4 @@ These are the small forks that change the design downstream — worth picking no
 - Don't build a real database (Postgres/SQLite). Parquet + a static viewer covers the "extract per-gene/per-perturbation and compare" use case at zero ops cost. Add a DB only if you outgrow this — concretely, when you want server-side joins across hundreds of bundles, which you don't yet.
 - Don't pursue Stlite/Pyodide unless you specifically need Python in the browser. The 5–15 s cold-start is felt by every visitor.
 - Don't render full TF networks; subgraph-on-query is the only thing that scales.
-- Don't change the existing [pipeline.py](perturbscope/pipeline.py) module contracts in this work; just add `bundle` as an additional terminal step.
+- Don't change the existing [pipeline.py](perturbflow/analyzer/pipeline.py) module contracts in this work; just add `bundle` as an additional terminal step.

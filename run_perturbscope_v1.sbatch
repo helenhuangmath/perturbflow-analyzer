@@ -70,7 +70,7 @@ fi
 
 export PYTHONPATH="$CODE_DIR${PYTHONPATH:+:$PYTHONPATH}"
 
-CMD=("$PYTHON_BIN" -m perturbscope.cli run --input "$INPUT_H5AD" --output "$OUTPUT_DIR" --config "$CONFIG_JSON" --steps "$STEPS_CSV")
+CMD=("$PYTHON_BIN" -m perturbflow.analyzer.cli run --input "$INPUT_H5AD" --output "$OUTPUT_DIR" --config "$CONFIG_JSON" --steps "$STEPS_CSV")
 if [[ -n "$PERT_COL" ]];    then CMD+=(--perturbation-col "$PERT_COL"); fi
 if [[ -n "$RESUME_FLAG" ]]; then CMD+=($RESUME_FLAG); fi
 if [[ -n "$FORCE_STEPS" ]]; then CMD+=(--force-steps "$FORCE_STEPS"); fi

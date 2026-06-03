@@ -124,7 +124,7 @@ perturbflow run --input prepared/my_data.perturbflow.h5ad --output results/my_ru
 ```text
 perturbflow-analyzer/
 ├── perturbflow/          # Public workflow, CLI, and AI/agent handoff
-├── perturbscope/         # Analysis engine
+├── perturbflow/analyzer/         # Analysis engine
 ├── configs/              # Default and test pipeline configs
 ├── examples/             # Notebook templates for common workflows
 ├── scripts/              # Companion scripts, including Seurat/Mixscape

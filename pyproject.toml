@@ -27,8 +27,8 @@ dev = ["pytest>=7"]
 
 [project.scripts]
 perturbflow = "perturbflow.cli:main"
-perturbscope = "perturbscope.cli:main"
-perturbscope-prepare = "perturbscope.process_data:main"
+perturbscope = "perturbflow.analyzer.cli:main"
+perturbscope-prepare = "perturbflow.analyzer.process_data:main"
 
 [tool.setuptools]
-packages = ["perturbflow", "perturbscope"]
+packages = ["perturbflow", "perturbflow.analyzer"]

@@ -14,7 +14,7 @@ def prepare_h5ad(
     cell_state_col: str | None = None,
 ) -> Path:
     """Standardize a user AnnData file for the PerturbFlow pipeline."""
-    from perturbscope.process_data import prepare_h5ad as _prepare_h5ad
+    from perturbflow.analyzer.process_data import prepare_h5ad as _prepare_h5ad
 
     return _prepare_h5ad(
         input_path=input_path,
@@ -37,10 +37,10 @@ def run_analysis(
 ):
     """Run the end-to-end PerturbFlow analysis.
 
-    This is a stable public wrapper around the PerturbScope analysis engine.
+    This is a stable public wrapper around the analyzer engine.
     """
-    from perturbscope.config import PipelineConfig
-    from perturbscope.pipeline import run_pipeline
+    from perturbflow.analyzer.config import PipelineConfig
+    from perturbflow.analyzer.pipeline import run_pipeline
 
     config = PipelineConfig.from_json(config_path) if config_path else PipelineConfig()
     return run_pipeline(

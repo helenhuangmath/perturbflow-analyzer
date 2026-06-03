@@ -25,9 +25,9 @@ Your input must be an AnnData `.h5ad` file with cells in rows, genes in columns,
 and an `obs` column containing perturbation labels.
 
 ```bash
-perturbscope prepare \
+perturbflow prepare \
   --input my_raw_data.h5ad \
-  --output prepared/my_data.perturbscope.h5ad \
+  --output prepared/my_data.perturbflow.h5ad \
   --perturbation-col guide_gene \
   --control-labels control,non-targeting,NT \
   --cell-state-col leiden
@@ -42,8 +42,8 @@ This writes:
 ## 3. Run The Pipeline
 
 ```bash
-perturbscope run \
-  --input prepared/my_data.perturbscope.h5ad \
+perturbflow run \
+  --input prepared/my_data.perturbflow.h5ad \
   --output results/my_run \
   --config configs/cluster_default.json \
   --resume
@@ -52,9 +52,9 @@ perturbscope run \
 Useful step-only reruns:
 
 ```bash
-perturbscope run --input prepared/my_data.perturbscope.h5ad --output results/my_run --steps deg,report,bundle
-perturbscope run --input prepared/my_data.perturbscope.h5ad --output results/my_run --force-steps report --resume
-perturbscope list-steps
+perturbflow run --input prepared/my_data.perturbflow.h5ad --output results/my_run --steps deg,report,bundle
+perturbflow run --input prepared/my_data.perturbflow.h5ad --output results/my_run --force-steps report --resume
+perturbflow list-steps
 ```
 
 ## 4. Run On Slurm
