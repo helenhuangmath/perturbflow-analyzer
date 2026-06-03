@@ -7,7 +7,7 @@ writes an interactive HTML report plus a viewer-ready results bundle.
 ## 1. Install
 
 ```bash
-cd /vast/projects/wherry/foundation-models-immuno/hhua/sc_perturbation/PerturbScope_v1
+cd /vast/projects/wherry/foundation-models-immuno/hhua/sc_perturbation/PerturbScope_v1/PerturbFlow
 python -m pip install -e .
 ```
 
@@ -16,7 +16,7 @@ On the Wherry cluster, use the existing environment:
 ```bash
 source /vast/parcc/spack/sw/apps/linux-sapphirerapids/anaconda3-2023.09-0-ieilyrkph5mewqcum3ajc4odlt2vakri/etc/profile.d/conda.sh
 conda activate /vast/projects/wherry/foundation-models-immuno/hhua/tools/perturbscope_env
-python -m pip install -e /vast/projects/wherry/foundation-models-immuno/hhua/sc_perturbation/PerturbScope_v1 --no-deps
+python -m pip install -e /vast/projects/wherry/foundation-models-immuno/hhua/sc_perturbation/PerturbScope_v1/PerturbFlow --no-deps
 ```
 
 ## 2. Prepare Your Data
