@@ -5,7 +5,7 @@
 #
 # Beyond standard scRNA-seq QC (gene counts, mitochondrial fraction), this
 # module computes three Perturb-seq-specific metrics that are novel to
-# PerturbScope:
+# PerturbFlow-Analyzer:
 #
 #   perturbation_burden       -- proxy for how heavily a cell is perturbed,
 #                                derived from guide count × total UMIs,

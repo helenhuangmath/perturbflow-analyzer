@@ -1,7 +1,7 @@
 # =============================================================================
 # perturbflow/analyzer/cli.py
 #
-# Command-line interface for PerturbScope.
+# Command-line interface for PerturbFlow-Analyzer.
 #
 # Entry point:  python -m perturbflow.analyzer.cli  (or the `perturbscope` script after
 #               `pip install -e .`)
@@ -75,7 +75,7 @@ def cmd_list_steps(_args):
 
 
 def build_parser():
-    parser = argparse.ArgumentParser(prog="perturbscope", description="PerturbScope CLI")
+    parser = argparse.ArgumentParser(prog="perturbscope", description="PerturbFlow-Analyzer CLI")
     sub = parser.add_subparsers(dest="command", required=True)
 
     # --- `run` subcommand ---
@@ -109,7 +109,7 @@ def build_parser():
     )
     run_p.set_defaults(func=cmd_run)
 
-    prep_p = sub.add_parser("prepare", help="Standardize a user .h5ad for PerturbScope")
+    prep_p = sub.add_parser("prepare", help="Standardize a user .h5ad for PerturbFlow-Analyzer")
     prep_p.add_argument("--input", required=True, help="Input .h5ad file")
     prep_p.add_argument("--output", required=True, help="Output standardized .h5ad file")
     prep_p.add_argument("--perturbation-col", required=True, help="obs column containing perturbation labels")

@@ -1,24 +1,24 @@
 #!/bin/bash
 # =============================================================================
-# run_perturbscope_v1.sbatch
+# run_perturbflow_analyzer.sbatch
 #
-# SLURM batch script for PerturbScope v1 (with viewer-ready bundle step).
+# SLURM batch script for PerturbFlow-Analyzer (with viewer-ready bundle step).
 #
 # Usage:
-#   sbatch run_perturbscope_v1.sbatch <input_h5ad> <output_dir> <config_json> [steps_csv] [perturbation_col]
+#   sbatch run_perturbflow_analyzer.sbatch <input_h5ad> <output_dir> <config_json> [steps_csv] [perturbation_col]
 #
 # Reuses the existing conda env at /vast/projects/wherry/foundation-models-immuno/hhua/tools/perturbscope_env
 # and pip-installs pyarrow on first run (idempotent — fast no-op on subsequent runs).
 # =============================================================================
-#SBATCH --job-name=perturbscope_v1
+#SBATCH --job-name=perturbflow_analyzer
 #SBATCH --partition=genoa-std-mem
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=48G
 #SBATCH --time=06:00:00
-#SBATCH --output=logs/perturbscope_v1_%j.out
-#SBATCH --error=logs/perturbscope_v1_%j.err
+#SBATCH --output=logs/perturbflow_analyzer_%j.out
+#SBATCH --error=logs/perturbflow_analyzer_%j.err
 
 set -euo pipefail
 
@@ -28,7 +28,7 @@ export XDG_CACHE_HOME="${TMPDIR:-/tmp}/xdg-cache-${SLURM_JOB_ID:-local}"
 mkdir -p "$MPLCONFIGDIR" "$XDG_CACHE_HOME"
 
 if [[ $# -lt 3 ]]; then
-  echo "Usage: sbatch run_perturbscope_v1.sbatch <input_h5ad> <output_dir> <config_json> [steps_csv] [perturbation_col] [--resume] [force_steps_csv]"
+  echo "Usage: sbatch run_perturbflow_analyzer.sbatch <input_h5ad> <output_dir> <config_json> [steps_csv] [perturbation_col] [--resume] [force_steps_csv]"
   exit 1
 fi
 
@@ -40,7 +40,7 @@ PERT_COL="${5:-}"
 RESUME_FLAG="${6:-}"        # pass --resume to skip already-completed steps
 FORCE_STEPS="${7:-}"        # comma-separated steps to re-run even if checkpointed
 
-CODE_DIR="/vast/projects/wherry/foundation-models-immuno/hhua/sc_perturbation/PerturbScope_v1"
+CODE_DIR="/vast/projects/wherry/foundation-models-immuno/hhua/sc_perturbation/PerturbFlow"
 ENV_DIR="/vast/projects/wherry/foundation-models-immuno/hhua/tools/perturbscope_env"
 
 # Resolve relative paths against CODE_DIR for inputs / configs and against
@@ -76,7 +76,7 @@ if [[ -n "$RESUME_FLAG" ]]; then CMD+=($RESUME_FLAG); fi
 if [[ -n "$FORCE_STEPS" ]]; then CMD+=(--force-steps "$FORCE_STEPS"); fi
 
 echo "============================================================"
-echo "PerturbScope v1 run"
+echo "PerturbFlow-Analyzer run"
 echo "Job ID    : ${SLURM_JOB_ID:-local}"
 echo "Node      : $(hostname)"
 echo "Started   : $(date)"

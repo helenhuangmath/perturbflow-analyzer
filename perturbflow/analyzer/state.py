@@ -1,7 +1,7 @@
 # =============================================================================
 # perturbflow/analyzer/state.py
 #
-# Dual-level effect decomposition — core novelty of PerturbScope.
+# Dual-level effect decomposition — core novelty of PerturbFlow-Analyzer.
 #
 # Standard pipelines report a single "perturbation effect".  This module
 # separates that effect into two orthogonal components:

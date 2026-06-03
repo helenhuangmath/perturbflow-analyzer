@@ -1,4 +1,4 @@
-# PerturbScope — Synthesized Design
+# PerturbFlow-Analyzer — Synthesized Design
 
 Combines the scientific modules from `tmp_plan_1` and the phased build from `tmp_plan_2` (already partially implemented in [perturbflow/analyzer/](perturbflow/analyzer/)) with the bundle + interactive-viewer architecture from `tmp_plan_3`.
 
@@ -16,7 +16,7 @@ The user-facing requirements (interactive exploration, per-gene / per-perturbati
 h5ad
   │
   ▼
-PerturbScope pipeline (existing perturbflow/analyzer/, Python)
+PerturbFlow-Analyzer pipeline (existing perturbflow/analyzer/, Python)
   - ingest → qc → preprocess → score → effects → trajectory → programs → interaction
   │
   ▼

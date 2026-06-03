@@ -1,4 +1,4 @@
-"""PerturbScope v1: state-aware Perturb-seq analysis engine."""
+"""PerturbFlow-Analyzer: state-aware Perturb-seq analysis engine."""
 
 __version__ = "1.0.0"
 

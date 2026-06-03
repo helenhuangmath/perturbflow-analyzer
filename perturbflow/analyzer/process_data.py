@@ -25,7 +25,7 @@ def prepare_h5ad(
     control_labels: str | None = None,
     cell_state_col: str | None = None,
 ) -> Path:
-    """Prepare a user AnnData file for PerturbScope.
+    """Prepare a user AnnData file for PerturbFlow-Analyzer.
 
     The pipeline expects perturbation labels in ``adata.obs["perturbation"]``.
     This helper keeps the original column and writes a standardized copy.
@@ -64,7 +64,7 @@ def prepare_h5ad(
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Prepare a .h5ad file for PerturbScope.")
+    parser = argparse.ArgumentParser(description="Prepare a .h5ad file for PerturbFlow-Analyzer.")
     parser.add_argument("--input", required=True, help="Input .h5ad file")
     parser.add_argument("--output", required=True, help="Output standardized .h5ad file")
     parser.add_argument("--perturbation-col", required=True, help="obs column containing guide/gene perturbation labels")

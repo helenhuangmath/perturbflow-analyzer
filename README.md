@@ -2,7 +2,7 @@
 
 PerturbFlow is a user-friendly Perturb-seq analysis package for moving from a user-provided AnnData file to quality control, perturbation scoring, differential expression, trajectory effects, gene-network rewiring, regulatory analysis, and interactive reports.
 
-The current implementation wraps the proven PerturbScope analysis engine and adds a clearer public command, documentation, and an AI/agent-ready interpretation handoff.
+The current implementation wraps the proven PerturbFlow-Analyzer analysis engine and adds a clearer public command, documentation, and an AI/agent-ready interpretation handoff.
 
 ## What PerturbFlow Produces
 
@@ -25,7 +25,7 @@ On the Wherry cluster, install into the existing environment without reinstallin
 ```bash
 source /vast/parcc/spack/sw/apps/linux-sapphirerapids/anaconda3-2023.09-0-ieilyrkph5mewqcum3ajc4odlt2vakri/etc/profile.d/conda.sh
 conda activate /vast/projects/wherry/foundation-models-immuno/hhua/tools/perturbscope_env
-python -m pip install -e /vast/projects/wherry/foundation-models-immuno/hhua/sc_perturbation/PerturbScope_v1/PerturbFlow --no-deps
+python -m pip install -e /vast/projects/wherry/foundation-models-immuno/hhua/sc_perturbation/PerturbFlow --no-deps
 ```
 
 ## Quick Start

@@ -1,6 +1,6 @@
 # Methods
 
-PerturbFlow currently uses the PerturbScope analysis engine. For detailed method notes, see:
+PerturbFlow currently uses the PerturbFlow-Analyzer analysis engine. For detailed method notes, see:
 
 - `METHOD.md`
 - `RESULT.md`

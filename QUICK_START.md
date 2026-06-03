@@ -1,13 +1,13 @@
-# PerturbScope Quick Start
+# PerturbFlow-Analyzer Quick Start
 
-PerturbScope takes a Perturb-seq `h5ad` file, standardizes perturbation labels,
+PerturbFlow-Analyzer takes a Perturb-seq `h5ad` file, standardizes perturbation labels,
 runs QC, scoring, DEG, network, regulatory, C-score, and report steps, then
 writes an interactive HTML report plus a viewer-ready results bundle.
 
 ## 1. Install
 
 ```bash
-cd /vast/projects/wherry/foundation-models-immuno/hhua/sc_perturbation/PerturbScope_v1/PerturbFlow
+cd /vast/projects/wherry/foundation-models-immuno/hhua/sc_perturbation/PerturbFlow
 python -m pip install -e .
 ```
 
@@ -16,7 +16,7 @@ On the Wherry cluster, use the existing environment:
 ```bash
 source /vast/parcc/spack/sw/apps/linux-sapphirerapids/anaconda3-2023.09-0-ieilyrkph5mewqcum3ajc4odlt2vakri/etc/profile.d/conda.sh
 conda activate /vast/projects/wherry/foundation-models-immuno/hhua/tools/perturbscope_env
-python -m pip install -e /vast/projects/wherry/foundation-models-immuno/hhua/sc_perturbation/PerturbScope_v1/PerturbFlow --no-deps
+python -m pip install -e /vast/projects/wherry/foundation-models-immuno/hhua/sc_perturbation/PerturbFlow --no-deps
 ```
 
 ## 2. Prepare Your Data
@@ -101,4 +101,4 @@ Optional but useful:
 - cell-state or cluster column, passed with `--cell-state-col`
 - QC metrics such as mitochondrial fraction or total counts
 
-PerturbScope will compute core QC/preprocessing features when they are missing.
+PerturbFlow-Analyzer will compute core QC/preprocessing features when they are missing.
