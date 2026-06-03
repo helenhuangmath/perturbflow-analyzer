@@ -15,7 +15,7 @@ The current implementation wraps the proven PerturbScope analysis engine and add
 ## Install
 
 ```bash
-git clone https://github.com/YOUR_ORG/perturbflow-analyzer.git
+git clone https://github.com/helenhuangmath/perturbflow-analyzer.git
 cd perturbflow-analyzer
 python -m pip install -e ".[bundle]"
 ```

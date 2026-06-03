@@ -1,6 +1,6 @@
 site_name: PerturbFlow
 site_description: User-friendly Perturb-seq analysis and AI-agent interpretation handoff
-repo_url: https://github.com/YOUR_ORG/perturbflow-analyzer
+repo_url: https://github.com/helenhuangmath/perturbflow-analyzer
 theme:
   name: material
   features:
