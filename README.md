@@ -15,8 +15,8 @@ The current release ships the `perturbflow.analyzer` subpackage for QC, perturba
 ## Install
 
 ```bash
-git clone https://github.com/helenhuangmath/perturbflow.git
-cd perturbflow
+git clone https://github.com/helenhuangmath/PerturbFlow.git
+cd PerturbFlow
 python -m pip install -e ".[bundle]"
 ```
 

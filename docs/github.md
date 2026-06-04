@@ -3,7 +3,7 @@
 Suggested repository name:
 
 ```text
-perturbflow
+PerturbFlow
 ```
 
 Suggested first workflow:
