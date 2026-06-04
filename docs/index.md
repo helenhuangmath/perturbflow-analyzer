@@ -1,6 +1,6 @@
 # PerturbFlow
 
-PerturbFlow helps users analyze Perturb-seq datasets from AnnData input through interactive reports and agent-ready interpretation files.
+PerturbFlow is a modular Perturb-seq framework. It currently ships an analyzer workflow for AnnData input, interactive reports, and agent-ready interpretation files, with a predictor namespace reserved for future perturbation response prediction models.
 
 ## Core Workflow
 

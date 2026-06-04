@@ -1,8 +1,8 @@
 # PerturbFlow
 
-PerturbFlow is a user-friendly Perturb-seq analysis package for moving from a user-provided AnnData file to quality control, perturbation scoring, differential expression, trajectory effects, gene-network rewiring, regulatory analysis, and interactive reports.
+PerturbFlow is a modular Perturb-seq framework for moving from user-provided AnnData files to analysis, reporting, AI-assisted interpretation, and future perturbation response prediction.
 
-The current implementation wraps the proven PerturbFlow-Analyzer analysis engine and adds a clearer public command, documentation, and an AI/agent-ready interpretation handoff.
+The current release ships the `perturbflow.analyzer` subpackage for QC, perturbation scoring, differential expression, trajectory effects, gene-network rewiring, regulatory analysis, interactive reports, and AI/agent-ready interpretation handoff. The `perturbflow.predictor` namespace is reserved for future model-based prediction features.
 
 ## What PerturbFlow Produces
 
@@ -15,8 +15,8 @@ The current implementation wraps the proven PerturbFlow-Analyzer analysis engine
 ## Install
 
 ```bash
-git clone https://github.com/helenhuangmath/perturbflow-analyzer.git
-cd perturbflow-analyzer
+git clone https://github.com/helenhuangmath/perturbflow.git
+cd perturbflow
 python -m pip install -e ".[bundle]"
 ```
 
@@ -95,7 +95,8 @@ PerturbFlow standardizes common control labels such as `control`, `ctrl`, `NT`, 
 ```bash
 perturbflow prepare      # Standardize input .h5ad metadata
 perturbflow run          # Run the full pipeline
-perturbflow analyze      # Alias for run
+perturbflow analyze      # Alias for the analyzer workflow
+perturbflow predict      # Reserved for future predictor features
 perturbflow interpret    # Export LLM/agent-ready interpretation context
 perturbflow list-steps   # Show available pipeline steps
 ```
@@ -122,9 +123,13 @@ perturbflow run --input prepared/my_data.perturbflow.h5ad --output results/my_ru
 ## Repository Layout
 
 ```text
-perturbflow-analyzer/
-├── perturbflow/          # Public workflow, CLI, and AI/agent handoff
-├── perturbflow/analyzer/         # Analysis engine
+perturbflow/
+├── perturbflow/          # Public package namespace and CLI
+├── perturbflow/analyzer/ # Current analysis engine
+├── perturbflow/data/     # Data preparation namespace
+├── perturbflow/predictor/ # Reserved future prediction namespace
+├── perturbflow/workflows/ # End-to-end workflow namespace
+├── perturbflow/viz/      # Visualization/reporting namespace
 ├── configs/              # Default and test pipeline configs
 ├── examples/             # Notebook templates for common workflows
 ├── scripts/              # Companion scripts, including Seurat/Mixscape

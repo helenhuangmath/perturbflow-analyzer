@@ -1,6 +1,6 @@
-# Analysis Workflow
+# Analyzer Workflow
 
-PerturbFlow runs a resumable pipeline with checkpointing.
+PerturbFlow Analyzer runs a resumable pipeline with checkpointing.
 
 ```text
 qc -> preprocess -> eda -> score -> effects -> trajectory -> programs

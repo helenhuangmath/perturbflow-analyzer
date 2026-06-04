@@ -2,7 +2,7 @@
 # =============================================================================
 # run_perturbflow_analyzer.sbatch
 #
-# SLURM batch script for PerturbFlow-Analyzer (with viewer-ready bundle step).
+# SLURM batch script for PerturbFlow Analyzer (with viewer-ready bundle step).
 #
 # Usage:
 #   sbatch run_perturbflow_analyzer.sbatch <input_h5ad> <output_dir> <config_json> [steps_csv] [perturbation_col]
@@ -76,7 +76,7 @@ if [[ -n "$RESUME_FLAG" ]]; then CMD+=($RESUME_FLAG); fi
 if [[ -n "$FORCE_STEPS" ]]; then CMD+=(--force-steps "$FORCE_STEPS"); fi
 
 echo "============================================================"
-echo "PerturbFlow-Analyzer run"
+echo "PerturbFlow Analyzer run"
 echo "Job ID    : ${SLURM_JOB_ID:-local}"
 echo "Node      : $(hostname)"
 echo "Started   : $(date)"

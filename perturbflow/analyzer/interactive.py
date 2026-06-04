@@ -539,7 +539,7 @@ def _html_template() -> str:
         '<head>\n'
         '<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-        '<title>PerturbFlow-Analyzer \u2014 Interactive Report</title>\n'
+        '<title>PerturbFlow Analyzer \u2014 Interactive Report</title>\n'
         '<style>\n'
         ':root{'
         # GEPIA-inspired dark-navy palette: deep navy primary, lighter blue
@@ -645,7 +645,7 @@ def _html_template() -> str:
         '</head>\n'
         '<body>\n'
         '<header>\n'
-        '  <h1>PerturbFlow-Analyzer</h1>\n'
+        '  <h1>PerturbFlow Analyzer</h1>\n'
         '  <span id="hdr-summary">Loading\u2026</span>\n'
         '</header>\n'
         '<div class="layout">\n'
@@ -1272,7 +1272,7 @@ _TAB_CSCORE = (
 _TAB_PARAMS = (
     '<div class="tab-pane" id="tab-params">\n'
     '  <h2>Analysis Parameters</h2>\n'
-    '  <p>Pipeline settings are grouped by analysis step so the report reflects the multi-step PerturbFlow-Analyzer workflow.</p>\n'
+    '  <p>Pipeline settings are grouped by analysis step so the report reflects the multi-step PerturbFlow Analyzer workflow.</p>\n'
     '  <h3>Pipeline Steps</h3>\n'
     '  <div class="tbl-wrap" style="margin-top:12px;">\n'
     '    <table class="param-table">\n'

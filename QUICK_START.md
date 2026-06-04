@@ -1,8 +1,9 @@
-# PerturbFlow-Analyzer Quick Start
+# PerturbFlow Quick Start
 
-PerturbFlow-Analyzer takes a Perturb-seq `h5ad` file, standardizes perturbation labels,
-runs QC, scoring, DEG, network, regulatory, C-score, and report steps, then
-writes an interactive HTML report plus a viewer-ready results bundle.
+PerturbFlow is a modular Perturb-seq framework. The current `analyzer`
+subpackage standardizes perturbation labels, runs QC, scoring, DEG, network,
+regulatory, C-score, and report steps, then writes an interactive HTML report
+plus a viewer-ready results bundle.
 
 ## 1. Install
 
@@ -59,19 +60,19 @@ perturbflow list-steps
 
 ## 4. Run On Slurm
 
-Use the mini20 scripts as templates:
+Use the included analyzer Slurm wrapper as a template:
 
 ```bash
-sbatch regen_mini20_full.sbatch
-sbatch regen_mini20_html_only.sbatch
+sbatch run_perturbflow_analyzer.sbatch prepared/my_data.perturbflow.h5ad results/my_run configs/cluster_default.json
 ```
 
-For a new dataset, copy one of these scripts and update:
+For a new dataset, update:
 
 - `CODE_DIR`
 - `ENV_DIR`
-- `RESULTS_DIR`
 - input `.h5ad`
+- output directory
+- config JSON
 - requested resources and wall time
 
 ## 5. Main Outputs
@@ -101,4 +102,4 @@ Optional but useful:
 - cell-state or cluster column, passed with `--cell-state-col`
 - QC metrics such as mitochondrial fraction or total counts
 
-PerturbFlow-Analyzer will compute core QC/preprocessing features when they are missing.
+PerturbFlow will compute core QC/preprocessing features when they are missing.

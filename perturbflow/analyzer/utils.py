@@ -1,7 +1,7 @@
 # =============================================================================
 # perturbflow/analyzer/utils.py
 #
-# Shared utility helpers used across all PerturbFlow-Analyzer modules.
+# Shared utility helpers used across all PerturbFlow Analyzer modules.
 # Contains directory management, numeric normalization, and safe DataFrame
 # column access.  No biological logic lives here.
 # =============================================================================

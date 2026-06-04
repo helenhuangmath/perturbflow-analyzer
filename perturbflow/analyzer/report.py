@@ -277,7 +277,7 @@ def write_report(adata, output_dir: str, effect_df=None, traj_df=None, program_d
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>PerturbFlow-Analyzer Report</title>
+  <title>PerturbFlow Analyzer Report</title>
   <style>
     body {{ font-family: sans-serif; max-width: 1100px; margin: 2rem auto; color: #222; }}
     h1   {{ border-bottom: 2px solid #2a9d8f; padding-bottom: .4rem; }}
@@ -292,7 +292,7 @@ def write_report(adata, output_dir: str, effect_df=None, traj_df=None, program_d
   </style>
 </head>
 <body>
-<h1>PerturbFlow-Analyzer Analysis Report</h1>
+<h1>PerturbFlow Analyzer Analysis Report</h1>
 <p>
   <strong>Cells:</strong> {int(adata.n_obs):,} &nbsp;|&nbsp;
   <strong>Genes:</strong> {int(adata.n_vars):,} &nbsp;|&nbsp;

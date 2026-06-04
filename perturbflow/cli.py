@@ -1,9 +1,8 @@
-"""Command-line interface for PerturbFlow."""
+"""Command-line interface for the PerturbFlow ecosystem."""
 
 from __future__ import annotations
 
 import argparse
-from pathlib import Path
 
 from .ai import write_agent_handoff
 from .workflow import prepare_h5ad, run_analysis
@@ -76,6 +75,13 @@ def cmd_list_steps(_args) -> None:
         print(f"  {index:2}. {step}")
 
 
+def cmd_predict(_args) -> None:
+    raise SystemExit(
+        "PerturbFlow Predictor is reserved for future perturbation response "
+        "prediction features and is not implemented yet."
+    )
+
+
 def _add_run_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--input", required=True, help="Input .h5ad file")
     parser.add_argument("--output", required=True, help="Output directory")
@@ -92,7 +98,7 @@ def _add_run_args(parser: argparse.ArgumentParser) -> None:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="perturbflow",
-        description="User-friendly Perturb-seq analysis, reporting, and AI-agent handoff.",
+        description="Modular Perturb-seq analysis, reporting, prediction, and AI-agent handoff.",
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
@@ -110,6 +116,9 @@ def build_parser() -> argparse.ArgumentParser:
     analyze = sub.add_parser("analyze", help="Alias for run")
     _add_run_args(analyze)
 
+    predict = sub.add_parser("predict", help="Reserved for future perturbation response prediction")
+    predict.set_defaults(func=cmd_predict)
+
     interpret = sub.add_parser("interpret", help="Create LLM/agent-ready interpretation files")
     interpret.add_argument("--results", required=True, help="Completed PerturbFlow result directory")
     interpret.add_argument("--output", default=None, help="Output directory for agent handoff files")
@@ -126,8 +135,6 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
-    if hasattr(args, "output") and args.output:
-        Path(args.output).mkdir(parents=True, exist_ok=True)
     args.func(args)
 
 

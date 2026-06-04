@@ -1,6 +1,6 @@
-# PerturbFlow-Analyzer — Methods
+# PerturbFlow Analyzer — Methods
 
-This file documents the analysis methods that PerturbFlow-Analyzer runs on a
+This file documents the analysis methods that PerturbFlow Analyzer runs on a
 Perturb-seq / CRISPR-screen `AnnData`. It is meant to be the
 publication-style "Methods" companion of `DESIGN.md` (which describes the
 software architecture). For each step we state the inputs, the algorithm,

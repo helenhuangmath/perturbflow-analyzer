@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "perturbflow"
 version = "0.1.0"
-description = "User-friendly Perturb-seq analysis, reporting, and AI-agent interpretation handoff"
+description = "Modular Perturb-seq analysis, reporting, prediction, and AI-agent interpretation framework"
 readme = "README.md"
 requires-python = ">=3.9"
 authors = [{name = "PerturbFlow Developers"}]
@@ -27,8 +27,11 @@ dev = ["pytest>=7"]
 
 [project.scripts]
 perturbflow = "perturbflow.cli:main"
+perturbflow-analyzer = "perturbflow.analyzer.cli:main"
 perturbscope = "perturbflow.analyzer.cli:main"
 perturbscope-prepare = "perturbflow.analyzer.process_data:main"
 
 [tool.setuptools]
-packages = ["perturbflow", "perturbflow.analyzer"]
+
+[tool.setuptools.packages.find]
+include = ["perturbflow*"]

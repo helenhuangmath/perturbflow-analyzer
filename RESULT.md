@@ -1,8 +1,8 @@
-# PerturbFlow-Analyzer — Results & Interpretation Guide
+# PerturbFlow Analyzer — Results & Interpretation Guide
 
 This document is a reader's manual for the analyses produced by
-**PerturbFlow-Analyzer** (the analysis pipeline in this repository, also
-referred to internally as `PerturbFlow-Analyzer`). For every analysis step it
+**PerturbFlow Analyzer** (the analysis pipeline in this repository, also
+referred to internally as `PerturbFlow Analyzer`). For every analysis step it
 describes:
 
 * **What it shows** — what the underlying computation is and what the
@@ -458,7 +458,7 @@ viewer.
 
 ## Reading order for a new dataset
 
-A practical sequence to interpret a fresh PerturbFlow-Analyzer run:
+A practical sequence to interpret a fresh PerturbFlow Analyzer run:
 
 1. **Sanity checks.** Open `qc_summary.png`,
    `eda_cells_per_perturbation.png`, and `eda_perturbation_similarity.png`
