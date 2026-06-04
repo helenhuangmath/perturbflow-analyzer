@@ -6,7 +6,7 @@ PerturbFlow is a modular Perturb-seq framework. It currently ships an analyzer w
 
 ```bash
 perturbflow prepare --input raw.h5ad --output prepared/data.h5ad --perturbation-col guide_gene
-perturbflow run --input prepared/data.h5ad --output results/run1 --resume
+perturbflow analyzer --input prepared/data.h5ad --output results/run1 --resume
 perturbflow interpret --results results/run1 --project-name "My Perturb-seq screen"
 ```
 

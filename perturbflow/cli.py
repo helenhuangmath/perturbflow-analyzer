@@ -110,11 +110,14 @@ def build_parser() -> argparse.ArgumentParser:
     prep.add_argument("--cell-state-col", default=None, help="Optional obs column to copy to cell_state")
     prep.set_defaults(func=cmd_prepare)
 
-    run = sub.add_parser("run", help="Run the end-to-end analysis")
-    _add_run_args(run)
+    analyzer = sub.add_parser("analyzer", help="Run the analyzer workflow")
+    _add_run_args(analyzer)
 
-    analyze = sub.add_parser("analyze", help="Alias for run")
+    analyze = sub.add_parser("analyze", help="Alias for analyzer")
     _add_run_args(analyze)
+
+    run = sub.add_parser("run", help="Alias for analyzer")
+    _add_run_args(run)
 
     predict = sub.add_parser("predict", help="Reserved for future perturbation response prediction")
     predict.set_defaults(func=cmd_predict)

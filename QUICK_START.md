@@ -43,7 +43,7 @@ This writes:
 ## 3. Run The Pipeline
 
 ```bash
-perturbflow run \
+perturbflow analyzer \
   --input prepared/my_data.perturbflow.h5ad \
   --output results/my_run \
   --config configs/cluster_default.json \
@@ -53,8 +53,8 @@ perturbflow run \
 Useful step-only reruns:
 
 ```bash
-perturbflow run --input prepared/my_data.perturbflow.h5ad --output results/my_run --steps deg,report,bundle
-perturbflow run --input prepared/my_data.perturbflow.h5ad --output results/my_run --force-steps report --resume
+perturbflow analyzer --input prepared/my_data.perturbflow.h5ad --output results/my_run --steps deg,report,bundle
+perturbflow analyzer --input prepared/my_data.perturbflow.h5ad --output results/my_run --force-steps report --resume
 perturbflow list-steps
 ```
 

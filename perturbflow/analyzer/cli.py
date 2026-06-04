@@ -3,9 +3,8 @@
 #
 # Command-line interface for PerturbFlow Analyzer.
 #
-# Entry point:  python -m perturbflow.analyzer.cli  (or the
-#               `perturbflow-analyzer` / legacy `perturbscope` scripts after
-#               `pip install -e .`)
+# Entry point:  perturbflow analyzer  (or the legacy `perturbscope` script
+#               after `pip install -e .`)
 #
 # Subcommands:
 #   run         -- Run the full pipeline or a subset of steps.
@@ -76,7 +75,7 @@ def cmd_list_steps(_args):
 
 
 def build_parser():
-    parser = argparse.ArgumentParser(prog="perturbflow-analyzer", description="PerturbFlow Analyzer CLI")
+    parser = argparse.ArgumentParser(prog="perturbflow analyzer", description="PerturbFlow Analyzer CLI")
     sub = parser.add_subparsers(dest="command", required=True)
 
     # --- `run` subcommand ---

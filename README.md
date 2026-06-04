@@ -44,7 +44,7 @@ perturbflow prepare \
 Run the analysis:
 
 ```bash
-perturbflow run \
+perturbflow analyzer \
   --input prepared/my_data.perturbflow.h5ad \
   --output results/my_run \
   --config configs/cluster_default.json \
@@ -94,8 +94,9 @@ PerturbFlow standardizes common control labels such as `control`, `ctrl`, `NT`, 
 
 ```bash
 perturbflow prepare      # Standardize input .h5ad metadata
-perturbflow run          # Run the full pipeline
-perturbflow analyze      # Alias for the analyzer workflow
+perturbflow analyzer     # Run the analyzer workflow
+perturbflow analyze      # Alias for analyzer
+perturbflow run          # Legacy alias for analyzer
 perturbflow predict      # Reserved for future predictor features
 perturbflow interpret    # Export LLM/agent-ready interpretation context
 perturbflow list-steps   # Show available pipeline steps
@@ -116,8 +117,8 @@ qc -> preprocess -> eda -> score -> effects -> trajectory -> programs
 Step-only reruns are useful while tuning reports:
 
 ```bash
-perturbflow run --input prepared/my_data.perturbflow.h5ad --output results/my_run --steps deg,report,bundle
-perturbflow run --input prepared/my_data.perturbflow.h5ad --output results/my_run --force-steps report --resume
+perturbflow analyzer --input prepared/my_data.perturbflow.h5ad --output results/my_run --steps deg,report,bundle
+perturbflow analyzer --input prepared/my_data.perturbflow.h5ad --output results/my_run --force-steps report --resume
 ```
 
 ## Repository Layout

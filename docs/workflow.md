@@ -13,17 +13,17 @@ qc -> preprocess -> eda -> score -> effects -> trajectory -> programs
 Run selected steps:
 
 ```bash
-perturbflow run --input prepared.h5ad --output results/run1 --steps deg,report,bundle
+perturbflow analyzer --input prepared.h5ad --output results/run1 --steps deg,report,bundle
 ```
 
 Force report regeneration:
 
 ```bash
-perturbflow run --input prepared.h5ad --output results/run1 --force-steps report --resume
+perturbflow analyzer --input prepared.h5ad --output results/run1 --force-steps report --resume
 ```
 
 Clear a checkpoint from a specific step:
 
 ```bash
-perturbflow run --input prepared.h5ad --output results/run1 --clear-from deg --resume
+perturbflow analyzer --input prepared.h5ad --output results/run1 --clear-from deg --resume
 ```

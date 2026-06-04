@@ -20,7 +20,7 @@ perturbflow prepare \
 ## Run Analysis
 
 ```bash
-perturbflow run \
+perturbflow analyzer \
   --input prepared/my_data.perturbflow.h5ad \
   --output results/my_run \
   --config configs/cluster_default.json \
