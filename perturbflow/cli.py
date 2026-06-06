@@ -64,7 +64,7 @@ def cmd_interpret(args) -> None:
         project_name=args.project_name,
         max_rows=args.max_rows,
     )
-    print("Wrote PerturbFlow agent handoff:")
+    print("Wrote PerturbFlow interpretation handoff:")
     for label, path in files.items():
         print(f"  {label}: {path}")
 
@@ -106,7 +106,7 @@ def _add_run_args(parser: argparse.ArgumentParser) -> None:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="perturbflow",
-        description="Open infrastructure for perturbation biology: analysis, reporting, AI-agent handoff, and benchmarking.",
+        description="Open infrastructure for perturbation biology: analysis, reporting, interpretation handoff, and benchmarking.",
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
@@ -133,9 +133,9 @@ def build_parser() -> argparse.ArgumentParser:
     benchmark = sub.add_parser("benchmark", help="Reserved for community evaluation/benchmarking (Aim 3)")
     benchmark.set_defaults(func=cmd_benchmark)
 
-    interpret = sub.add_parser("interpret", help="Create LLM/agent-ready interpretation files")
+    interpret = sub.add_parser("interpret", help="Create structured interpretation files")
     interpret.add_argument("--results", required=True, help="Completed PerturbFlow result directory")
-    interpret.add_argument("--output", default=None, help="Output directory for agent handoff files")
+    interpret.add_argument("--output", default=None, help="Output directory for interpretation handoff files")
     interpret.add_argument("--project-name", default="PerturbFlow run", help="Human-readable analysis name")
     interpret.add_argument("--max-rows", type=int, default=10, help="Rows to include per summary table")
     interpret.set_defaults(func=cmd_interpret)

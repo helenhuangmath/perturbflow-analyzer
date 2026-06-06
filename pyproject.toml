@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "perturbflow"
 version = "0.1.0"
-description = "Open infrastructure for perturbation biology: AnnData-native analysis, mechanistic interpretation, AI-ready outputs, and benchmarking"
+description = "Open infrastructure for perturbation biology: AnnData-native analysis, mechanistic interpretation, structured outputs, and benchmarking"
 readme = "README.md"
 requires-python = ">=3.9"
 license = {file = "LICENSE"}

@@ -1,5 +1,5 @@
 site_name: PerturbFlow
-site_description: Open infrastructure for perturbation biology — analysis, mechanistic interpretation, AI-ready outputs, and benchmarking
+site_description: Open infrastructure for perturbation biology — analysis, mechanistic interpretation, structured outputs, and benchmarking
 repo_url: https://github.com/helenhuangmath/PerturbFlow
 theme:
   name: material
@@ -14,7 +14,7 @@ nav:
   - Data Input: data-input.md
   - Analysis Workflow: workflow.md
   - Examples: examples.md
-  - AI And Agents: ai-agents.md
+  - Interpretation Handoff: ai-agents.md
   - Outputs: outputs.md
   - Methods: methods.md
   - GitHub Setup: github.md

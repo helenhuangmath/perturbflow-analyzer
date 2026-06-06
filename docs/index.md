@@ -5,15 +5,15 @@
 PerturbFlow is an open-source, AnnData-native platform for perturbation
 experiments — Perturb-seq, pooled CRISPR screens, and single-cell multi-omics.
 It standardizes data representation, reproducible workflows, mechanistic
-(rewiring-aware) interpretation, and AI-ready outputs, and complements the
+(rewiring-aware) interpretation, and structured outputs, and complements the
 scverse ecosystem rather than replacing it.
 
 The project is organized around three aims — community-standard infrastructure,
-AI-ready perturbation biology, and community benchmarks. See the
+model-ready perturbation biology, and community benchmarks. See the
 [Vision and Roadmap](vision.md) for details.
 
 The current release ships an analyzer workflow for AnnData input, interactive
-reports, and agent-ready interpretation files. The `predictor` and `benchmark`
+reports, and structured interpretation files. The `predictor` and `benchmark`
 namespaces are reserved for the prediction and evaluation work on the roadmap.
 
 ## Core Workflow
@@ -32,6 +32,6 @@ perturbflow interpret --results results/run1 --project-name "My Perturb-seq scre
 - Cell-state and trajectory effects.
 - Gene-network and TF-network rewiring.
 - Static and interactive HTML reports.
-- Agent handoff files for LLM-assisted interpretation.
+- Structured handoff files for downstream interpretation.
 
-PerturbFlow keeps LLM integration explicit: it prepares interpretation context, but it does not upload data automatically.
+PerturbFlow prepares interpretation context, but it does not upload data automatically.

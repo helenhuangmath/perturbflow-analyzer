@@ -4,7 +4,7 @@ title: "PerturbFlow: Open Infrastructure for Perturbation Biology"
 abstract: >-
   PerturbFlow is an open-source, AnnData-native infrastructure layer for
   perturbation biology. It standardizes data representation, reproducible
-  workflows, mechanistic (rewiring-aware) interpretation, AI-ready outputs, and
+  workflows, mechanistic (rewiring-aware) interpretation, structured outputs, and
   community benchmarks across perturbation experiments such as Perturb-seq,
   CRISPR screens, and single-cell multi-omics.
 type: software

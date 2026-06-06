@@ -6,7 +6,7 @@ PerturbFlow is an open-source, AnnData-native platform that provides a unified
 infrastructure layer for perturbation experiments — Perturb-seq, pooled CRISPR
 screens, and single-cell multi-omics. Rather than being one more standalone
 analysis method, it standardizes data representation, reproducible workflows,
-mechanistic interpretation, and AI-ready outputs, and complements the scverse
+mechanistic interpretation, and structured outputs, and complements the scverse
 ecosystem rather than replacing it.
 
 A distinctive capability is **rewiring-aware interpretation**: PerturbFlow
@@ -18,14 +18,14 @@ The project is organized around three aims (see [`ROADMAP.md`](ROADMAP.md)):
 
 1. **Community-standard infrastructure** — stable AnnData schemas, reproducible
    workflows, interactive reports, reference datasets, and interoperable APIs.
-2. **AI-ready perturbation biology** — model-ready exports, scalable processing,
-   and interfaces for AI agents and workflow managers.
+2. **Model-ready perturbation biology** — standardized exports, scalable
+   processing, and interfaces for workflow managers.
 3. **Community benchmarks** — baseline-calibrated, distance-aware, and
    rewiring-aware evaluation with reproducible benchmarking workflows.
 
 The current release ships the `perturbflow.analyzer` subpackage for QC,
 perturbation scoring, differential expression, trajectory effects, gene-network
-rewiring, regulatory analysis, interactive reports, and AI/agent-ready
+rewiring, regulatory analysis, interactive reports, and structured
 interpretation handoff. The `perturbflow.predictor` and `perturbflow.benchmark`
 namespaces are reserved for the prediction (Aim 2) and benchmarking (Aim 3)
 work on the roadmap.
@@ -36,7 +36,7 @@ work on the roadmap.
 - Reproducible pipeline outputs: QC plots, DEG tables, trajectory summaries, program scores, gene networks, C-scores, regulatory results, and final AnnData.
 - `report.html` and `interactive_report.html` for browser-based review.
 - A viewer-ready `bundle/` directory for downstream web apps.
-- `agent_handoff/` files that summarize the run for LLMs or analysis agents without including raw count matrices.
+- `agent_handoff/` files that summarize the run for downstream review without including raw count matrices.
 
 ## Install
 
@@ -114,7 +114,7 @@ Open the main report:
 results/my_run/interactive_report.html
 ```
 
-Create the AI/agent interpretation handoff:
+Create the structured interpretation handoff:
 
 ```bash
 perturbflow interpret \
@@ -132,7 +132,7 @@ results/my_run/agent_handoff/
 └── machine_context.json
 ```
 
-Review these files before sharing them with an external LLM provider.
+Review these files before sharing them outside your analysis environment.
 
 ## Expected Input
 
@@ -156,7 +156,7 @@ perturbflow analyze      # Alias for analyzer
 perturbflow run          # Legacy alias for analyzer
 perturbflow predict      # Reserved for future predictor features (Aim 2)
 perturbflow benchmark    # Reserved for community evaluation tooling (Aim 3)
-perturbflow interpret    # Export LLM/agent-ready interpretation context
+perturbflow interpret    # Export structured interpretation context
 perturbflow list-steps   # Show available pipeline steps
 ```
 
@@ -226,19 +226,22 @@ Notebook templates are available in [`examples/`](examples/):
 
 - `01_prepare_and_run.ipynb`: prepare data and run the full pipeline.
 - `02_step_rerun_and_config.ipynb`: customize config and rerun selected steps.
-- `03_interpret_with_agents.ipynb`: create AI/agent-ready interpretation files.
+- `03_interpret_with_agents.ipynb`: create structured interpretation files.
 - `04_explore_outputs.ipynb`: inspect result tables, reports, and bundles.
 
-## AI And Agent Design
+## Interpretation Handoff
 
-PerturbFlow does not send data to any LLM service automatically. Instead, `perturbflow interpret` creates a compact handoff package with:
+PerturbFlow does not send data to any external service automatically. Instead,
+`perturbflow interpret` creates a compact handoff package with:
 
 - A human-readable interpretation context.
-- A reusable agent prompt.
+- A reusable analysis prompt.
 - A machine-readable JSON summary.
-- A manifest describing suggested agent roles.
+- A manifest describing suggested review roles.
 
-This makes it possible to connect outputs to local LLMs, OpenAI-compatible APIs, custom agents, or collaborative report-writing workflows while preserving analyst control over privacy and provenance.
+This makes it possible to connect outputs to collaborative review and
+report-writing workflows while preserving analyst control over privacy and
+provenance.
 
 ## Development
 

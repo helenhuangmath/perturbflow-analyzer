@@ -1,4 +1,4 @@
-"""Agent-ready interpretation exports for PerturbFlow result folders."""
+"""Structured interpretation exports for PerturbFlow result folders."""
 
 from __future__ import annotations
 
@@ -97,7 +97,7 @@ def collect_result_context(results_dir: str | Path, max_rows: int = 10) -> dict[
 
 
 def build_interpretation_markdown(context: dict[str, Any], project_name: str = "PerturbFlow run") -> str:
-    """Render a concise LLM/agent context document from result summaries."""
+    """Render a concise interpretation context document from result summaries."""
     summary = context.get("summary") or {}
     checkpoint = context.get("checkpoint") or {}
     bundle_manifest = context.get("bundle_manifest") or {}
@@ -105,7 +105,7 @@ def build_interpretation_markdown(context: dict[str, Any], project_name: str = "
     lines = [
         f"# {project_name} interpretation context",
         "",
-        "This file is designed for a human analyst or an LLM/agent to interpret a completed PerturbFlow run.",
+        "This file is designed for a human analyst to interpret a completed PerturbFlow run.",
         "It summarizes derived tables and report artifacts; it does not include raw count matrices.",
         "",
         "## Dataset overview",
@@ -154,7 +154,7 @@ def build_interpretation_markdown(context: dict[str, Any], project_name: str = "
 
 
 def build_agent_prompt(project_name: str = "PerturbFlow run") -> str:
-    """Return a reusable prompt for an external LLM/agent."""
+    """Return a reusable analysis prompt."""
     return f"""You are a careful single-cell perturbation analysis assistant.
 
 Use the attached `{project_name} interpretation context` and the linked PerturbFlow result artifacts to write a scientist-facing interpretation.
@@ -175,7 +175,7 @@ def write_agent_handoff(
     project_name: str = "PerturbFlow run",
     max_rows: int = 10,
 ) -> dict[str, str]:
-    """Write agent-ready Markdown and JSON files for a completed run."""
+    """Write structured Markdown and JSON files for a completed run."""
     root = Path(results_dir)
     out = Path(output_dir) if output_dir else root / "agent_handoff"
     out.mkdir(parents=True, exist_ok=True)
@@ -195,14 +195,14 @@ def write_agent_handoff(
             "agent_prompt": "agent_prompt.md",
             "machine_context": "machine_context.json",
         },
-        "recommended_agents": [
+        "recommended_review_roles": [
             "qc_reviewer",
             "perturbation_prioritizer",
             "pathway_interpreter",
             "network_rewiring_interpreter",
             "report_writer",
         ],
-        "privacy_note": "Review files before sending to external LLM providers. Raw count matrices are not included by this exporter.",
+        "privacy_note": "Review files before sharing them outside your analysis environment. Raw count matrices are not included by this exporter.",
     }
 
     (out / "interpretation_context.md").write_text(context_md, encoding="utf-8")

@@ -1,7 +1,7 @@
 """PerturbFlow: open infrastructure for perturbation biology.
 
 AnnData-native, scverse-interoperable tooling for standardized analysis,
-mechanistic (rewiring-aware) interpretation, AI-ready outputs, and community
+mechanistic (rewiring-aware) interpretation, structured outputs, and community
 benchmarks across Perturb-seq, CRISPR screens, and single-cell multi-omics.
 """
 

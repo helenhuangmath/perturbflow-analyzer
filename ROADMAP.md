@@ -26,20 +26,19 @@ perturbation datasets.
 | 🔜 Planned | Curated reference dataset loaders (≥ 3 public Perturb-seq datasets) |
 | 🔜 Planned | Stable public Python API surface and semantic-versioning policy |
 
-## Aim 2 — AI-ready perturbation biology
+## Aim 2 — Model-ready perturbation biology
 
-Foundation-model-ready datasets, standardized exports, scalable processing, and
-interfaces for AI agents and workflow systems.
+Standardized exports, scalable processing, and interfaces for workflow systems.
 
 **Milestone (month 18):** public benchmark-ready dataset collection and an
-AI-integration toolkit.
+interoperability toolkit.
 
 | Status | Item |
 | --- | --- |
-| ✅ Done | `perturbflow interpret` agent-handoff exports (no automatic data upload) |
+| ✅ Done | `perturbflow interpret` structured handoff exports (no automatic data upload) |
 | 🔜 Planned | Standardized model-ready export format for perturbation datasets |
 | 🔜 Planned | Scalable / chunked processing for large screens |
-| 🔜 Planned | Agent and workflow-manager interfaces (e.g. Nextflow / Snakemake adapters) |
+| 🔜 Planned | Workflow-manager interfaces (e.g. Nextflow / Snakemake adapters) |
 
 ## Aim 3 — Community benchmarks for perturbation biology
 

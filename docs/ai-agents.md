@@ -1,6 +1,7 @@
-# AI And Agents
+# Interpretation Handoff
 
-PerturbFlow is designed to connect analysis outputs to LLMs and agents without making hidden network calls.
+PerturbFlow is designed to package analysis outputs for structured downstream
+review without making hidden network calls.
 
 ## Export Interpretation Context
 
@@ -18,7 +19,7 @@ agent_handoff/
 └── machine_context.json
 ```
 
-## Suggested Agent Roles
+## Suggested Review Roles
 
 - QC reviewer.
 - Perturbation prioritizer.
@@ -28,4 +29,6 @@ agent_handoff/
 
 ## Privacy
 
-The handoff exporter summarizes derived tables and report artifacts. It does not include raw count matrices. Review the files before sending them to an external model provider.
+The handoff exporter summarizes derived tables and report artifacts. It does not
+include raw count matrices. Review the files before sharing them outside your
+analysis environment.

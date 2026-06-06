@@ -24,4 +24,4 @@ results/my_run/
 | `csv/cscore_summary.csv` | Connectivity rewiring scores |
 | `csv/effect_decomposition.csv` | Transcriptional and state-shift effect summaries |
 | `bundle/manifest.json` | Versioned artifact index for downstream viewers |
-| `agent_handoff/interpretation_context.md` | LLM/agent-ready context |
+| `agent_handoff/interpretation_context.md` | Structured interpretation context |

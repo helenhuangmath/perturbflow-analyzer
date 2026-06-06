@@ -3,7 +3,7 @@
 PerturbFlow is **open infrastructure for perturbation biology**. Rather than
 being one more standalone analysis method, it standardizes how perturbation data
 is represented, analyzed, interpreted, and evaluated — connecting experimental
-data, mechanistic interpretation, and AI workflows in one interoperable,
+data, mechanistic interpretation, and scalable workflows in one interoperable,
 AnnData-native framework that complements the scverse ecosystem.
 
 A distinctive capability is **rewiring-aware interpretation**: distinguishing
@@ -21,13 +21,13 @@ datasets, and interoperable APIs.
 *Milestone:* a `v1.0` release with validated workflows across at least three
 public perturbation datasets.
 
-### Aim 2 — AI-ready perturbation biology
+### Aim 2 — Model-ready perturbation biology
 
-Foundation-model-ready datasets, standardized exports, scalable processing for
-large screens, and interfaces for AI agents and workflow managers.
+Standardized exports, scalable processing for large screens, and interfaces for
+workflow managers.
 
 *Milestone (month 18):* a public benchmark-ready dataset collection and an
-AI-integration toolkit.
+interoperability toolkit.
 
 ### Aim 3 — Community benchmarks
 
