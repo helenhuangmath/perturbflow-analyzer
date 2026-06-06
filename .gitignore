@@ -25,6 +25,7 @@ results*/
 logs/
 slurm-*.out
 *.h5ad
+!examples/data/*.h5ad
 *.h5seurat
 *.rds
 *.loom

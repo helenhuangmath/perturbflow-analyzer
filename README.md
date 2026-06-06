@@ -62,7 +62,32 @@ python -m pip install -e /path/to/PerturbFlow --no-deps
 
 ## Quick Start
 
-Prepare an AnnData file:
+Run the included real-data smoke test:
+
+```bash
+perturbflow prepare \
+  --input examples/data/adamson_2016_upr_360x1000.h5ad \
+  --output prepared/adamson_2016_upr.perturbflow.h5ad \
+  --perturbation-col guide_gene \
+  --control-labels non-targeting \
+  --cell-state-col cell_state_hint
+```
+
+```bash
+perturbflow analyzer \
+  --input prepared/adamson_2016_upr.perturbflow.h5ad \
+  --output results/adamson_2016_upr_quickstart \
+  --config configs/quickstart.json \
+  --no-resume
+```
+
+Open:
+
+```text
+results/adamson_2016_upr_quickstart/interactive_report.html
+```
+
+Prepare your own AnnData file:
 
 ```bash
 perturbflow prepare \

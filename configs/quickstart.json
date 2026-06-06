@@ -1,0 +1,31 @@
+{
+  "min_genes": 100,
+  "max_pct_mt": 30.0,
+  "min_cells_per_perturbation": 20,
+  "n_neighbors": 10,
+  "n_top_genes_signature": 20,
+  "random_state": 0,
+  "leiden_resolution": 0.2,
+  "bundle_top_de_per_pert": 50,
+  "bundle_min_de_hits_per_gene": 1,
+  "bundle_schema_version": "1.0",
+  "eda_n_top_genes": 200,
+  "eda_max_cells_heatmap": 120,
+  "deg_n_top_perturbations": 3,
+  "deg_logfc_threshold": 0.5,
+  "deg_pval_threshold": 0.05,
+  "deg_n_top_heatmap": 10,
+  "genenet_n_top_genes": 25,
+  "genenet_n_gene_clusters": 4,
+  "genenet_corr_threshold": 0.5,
+  "default_steps": [
+    "qc",
+    "preprocess",
+    "eda",
+    "score",
+    "effects",
+    "deg",
+    "report",
+    "bundle"
+  ]
+}

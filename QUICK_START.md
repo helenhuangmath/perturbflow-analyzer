@@ -9,8 +9,8 @@ plus a viewer-ready results bundle.
 ## 1. Install
 
 ```bash
-cd /vast/projects/wherry/foundation-models-immuno/hhua/sc_perturbation/PerturbFlow
-python -m pip install -e .
+cd PerturbFlow
+python -m pip install -e ".[bundle]"
 ```
 
 On the Wherry cluster, use the existing environment:
@@ -21,7 +21,67 @@ conda activate /vast/projects/wherry/foundation-models-immuno/hhua/tools/perturb
 python -m pip install -e /vast/projects/wherry/foundation-models-immuno/hhua/sc_perturbation/PerturbFlow --no-deps
 ```
 
-## 2. Prepare Your Data
+## 2. Run The Real Example Dataset
+
+The repository includes a small real-data subset for testing:
+
+```text
+examples/data/adamson_2016_upr_360x1000.h5ad
+```
+
+It is a 360-cell by 1,000-gene subset of the scPerturb Adamson/Weissman 2016
+pilot Perturb-seq dataset, balanced across one non-targeting/control-like guide
+barcode and five UPR perturbations. The subset is intentionally small so the
+quick workflow can run on a laptop or login node.
+
+Prepare the example AnnData:
+
+```bash
+perturbflow prepare \
+  --input examples/data/adamson_2016_upr_360x1000.h5ad \
+  --output prepared/adamson_2016_upr.perturbflow.h5ad \
+  --perturbation-col guide_gene \
+  --control-labels non-targeting \
+  --cell-state-col cell_state_hint
+```
+
+Run a fast analysis path:
+
+```bash
+perturbflow analyzer \
+  --input prepared/adamson_2016_upr.perturbflow.h5ad \
+  --output results/adamson_2016_upr_quickstart \
+  --config configs/quickstart.json \
+  --no-resume
+```
+
+This quick config runs:
+
+```text
+qc, preprocess, eda, score, effects, deg, report, bundle
+```
+
+Open the main result:
+
+```text
+results/adamson_2016_upr_quickstart/interactive_report.html
+```
+
+Other useful files:
+
+- `results/adamson_2016_upr_quickstart/report.html`
+- `results/adamson_2016_upr_quickstart/csv/deg_summary.csv`
+- `results/adamson_2016_upr_quickstart/csv/effect_decomposition.csv`
+- `results/adamson_2016_upr_quickstart/plots/qc_summary.png`
+- `results/adamson_2016_upr_quickstart/bundle/manifest.json`
+
+Rebuild the example subset from the public scPerturb source:
+
+```bash
+python scripts/make_example_subset.py
+```
+
+## 3. Prepare Your Own Data
 
 Your input must be an AnnData `.h5ad` file with cells in rows, genes in columns,
 and an `obs` column containing perturbation labels.
@@ -41,7 +101,7 @@ This writes:
 - `obs["perturbation_original"]`: original labels
 - `obs["cell_state"]`: optional copied cell-state labels
 
-## 3. Run The Pipeline
+## 4. Run The Full Pipeline
 
 ```bash
 perturbflow analyzer \
@@ -59,7 +119,7 @@ perturbflow analyzer --input prepared/my_data.perturbflow.h5ad --output results/
 perturbflow list-steps
 ```
 
-## 4. Run On Slurm
+## 5. Run On Slurm
 
 Use the included analyzer Slurm wrapper as a template:
 
@@ -76,7 +136,7 @@ For a new dataset, update:
 - config JSON
 - requested resources and wall time
 
-## 5. Main Outputs
+## 6. Main Outputs
 
 After the run, open:
 
@@ -92,7 +152,7 @@ Other useful outputs:
 - `results/my_run/bundle/`: compact viewer-ready data bundle
 - `results/my_run/checkpoint.json`: completed steps for resume
 
-## 6. Expected Input Columns
+## 7. Expected Input Columns
 
 Minimum:
 
