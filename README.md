@@ -1,8 +1,34 @@
 # PerturbFlow
 
-PerturbFlow is a modular Perturb-seq framework for moving from user-provided AnnData files to analysis, reporting, AI-assisted interpretation, and future perturbation response prediction.
+**Open infrastructure for perturbation biology.**
 
-The current release ships the `perturbflow.analyzer` subpackage for QC, perturbation scoring, differential expression, trajectory effects, gene-network rewiring, regulatory analysis, interactive reports, and AI/agent-ready interpretation handoff. The `perturbflow.predictor` namespace is reserved for future model-based prediction features.
+PerturbFlow is an open-source, AnnData-native platform that provides a unified
+infrastructure layer for perturbation experiments — Perturb-seq, pooled CRISPR
+screens, and single-cell multi-omics. Rather than being one more standalone
+analysis method, it standardizes data representation, reproducible workflows,
+mechanistic interpretation, and AI-ready outputs, and complements the scverse
+ecosystem rather than replacing it.
+
+A distinctive capability is **rewiring-aware interpretation**: PerturbFlow
+distinguishes perturbations that *amplify* existing transcriptional programs
+from those that *reorganize* regulatory relationships — interpretable signal
+that prediction-accuracy metrics alone miss.
+
+The project is organized around three aims (see [`ROADMAP.md`](ROADMAP.md)):
+
+1. **Community-standard infrastructure** — stable AnnData schemas, reproducible
+   workflows, interactive reports, reference datasets, and interoperable APIs.
+2. **AI-ready perturbation biology** — model-ready exports, scalable processing,
+   and interfaces for AI agents and workflow managers.
+3. **Community benchmarks** — baseline-calibrated, distance-aware, and
+   rewiring-aware evaluation with reproducible benchmarking workflows.
+
+The current release ships the `perturbflow.analyzer` subpackage for QC,
+perturbation scoring, differential expression, trajectory effects, gene-network
+rewiring, regulatory analysis, interactive reports, and AI/agent-ready
+interpretation handoff. The `perturbflow.predictor` and `perturbflow.benchmark`
+namespaces are reserved for the prediction (Aim 2) and benchmarking (Aim 3)
+work on the roadmap.
 
 ## What PerturbFlow Produces
 
@@ -20,13 +46,19 @@ cd PerturbFlow
 python -m pip install -e ".[bundle]"
 ```
 
-On the Wherry cluster, install into the existing environment without reinstalling dependencies:
+<details>
+<summary>Cluster install (existing conda environment, no dependency reinstall)</summary>
+
+On an HPC cluster with a pre-built environment, install in place without
+re-resolving dependencies:
 
 ```bash
-source /vast/parcc/spack/sw/apps/linux-sapphirerapids/anaconda3-2023.09-0-ieilyrkph5mewqcum3ajc4odlt2vakri/etc/profile.d/conda.sh
-conda activate /vast/projects/wherry/foundation-models-immuno/hhua/tools/perturbscope_env
-python -m pip install -e /vast/projects/wherry/foundation-models-immuno/hhua/sc_perturbation/PerturbFlow --no-deps
+source /path/to/anaconda3/etc/profile.d/conda.sh
+conda activate /path/to/your/perturbflow_env
+python -m pip install -e /path/to/PerturbFlow --no-deps
 ```
+
+</details>
 
 ## Quick Start
 
@@ -97,7 +129,8 @@ perturbflow prepare      # Standardize input .h5ad metadata
 perturbflow analyzer     # Run the analyzer workflow
 perturbflow analyze      # Alias for analyzer
 perturbflow run          # Legacy alias for analyzer
-perturbflow predict      # Reserved for future predictor features
+perturbflow predict      # Reserved for future predictor features (Aim 2)
+perturbflow benchmark    # Reserved for community evaluation tooling (Aim 3)
 perturbflow interpret    # Export LLM/agent-ready interpretation context
 perturbflow list-steps   # Show available pipeline steps
 ```
@@ -128,19 +161,28 @@ perturbflow/
 ├── perturbflow/          # Public package namespace and CLI
 ├── perturbflow/analyzer/ # Current analysis engine
 ├── perturbflow/data/     # Data preparation namespace
-├── perturbflow/predictor/ # Reserved future prediction namespace
+├── perturbflow/predictor/ # Reserved prediction namespace (Aim 2)
+├── perturbflow/benchmark/ # Reserved benchmarking namespace (Aim 3)
 ├── perturbflow/workflows/ # End-to-end workflow namespace
 ├── perturbflow/viz/      # Visualization/reporting namespace
 ├── configs/              # Default and test pipeline configs
 ├── examples/             # Notebook templates for common workflows
 ├── scripts/              # Companion scripts, including Seurat/Mixscape
 ├── docs/                 # MkDocs documentation site
+├── ROADMAP.md            # Aims, milestones, and status
+├── CONTRIBUTING.md
 ├── README.md
 ├── QUICK_START.md
 ├── METHOD.md
 ├── RESULT.md
 └── pyproject.toml
 ```
+
+## Project Documents
+
+- [`ROADMAP.md`](ROADMAP.md) — aims mapped to concrete work and status.
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — how to get involved.
+- [`DESIGN.md`](DESIGN.md) / [`METHOD.md`](METHOD.md) — architecture and methods.
 
 ## Web Documentation
 

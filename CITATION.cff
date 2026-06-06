@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use PerturbFlow in your research, please cite it as below."
+title: "PerturbFlow: Open Infrastructure for Perturbation Biology"
+abstract: >-
+  PerturbFlow is an open-source, AnnData-native infrastructure layer for
+  perturbation biology. It standardizes data representation, reproducible
+  workflows, mechanistic (rewiring-aware) interpretation, AI-ready outputs, and
+  community benchmarks across perturbation experiments such as Perturb-seq,
+  CRISPR screens, and single-cell multi-omics.
+type: software
+authors:
+  - name: "PerturbFlow Developers"
+license: MIT
+repository-code: "https://github.com/helenhuangmath/PerturbFlow"
+url: "https://github.com/helenhuangmath/PerturbFlow"
+version: "0.1.0"
+keywords:
+  - perturbation-biology
+  - perturb-seq
+  - crispr-screens
+  - single-cell
+  - anndata
+  - scverse
+  - benchmarking
+  - gene-regulatory-networks

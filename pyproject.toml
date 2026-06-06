@@ -5,10 +5,28 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "perturbflow"
 version = "0.1.0"
-description = "Modular Perturb-seq analysis, reporting, prediction, and AI-agent interpretation framework"
+description = "Open infrastructure for perturbation biology: AnnData-native analysis, mechanistic interpretation, AI-ready outputs, and benchmarking"
 readme = "README.md"
 requires-python = ">=3.9"
+license = {file = "LICENSE"}
 authors = [{name = "PerturbFlow Developers"}]
+keywords = [
+  "perturbation-biology",
+  "perturb-seq",
+  "crispr-screens",
+  "single-cell",
+  "anndata",
+  "scverse",
+  "benchmarking",
+  "gene-regulatory-networks",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
 dependencies = [
   "anndata>=0.9",
   "numpy>=1.23",
@@ -24,6 +42,12 @@ dependencies = [
 bundle = ["pyarrow>=12"]
 docs = ["mkdocs>=1.5", "mkdocs-material>=9.5"]
 dev = ["pytest>=7"]
+
+[project.urls]
+Homepage = "https://github.com/helenhuangmath/PerturbFlow"
+Repository = "https://github.com/helenhuangmath/PerturbFlow"
+Documentation = "https://github.com/helenhuangmath/PerturbFlow#readme"
+Issues = "https://github.com/helenhuangmath/PerturbFlow/issues"
 
 [project.scripts]
 perturbflow = "perturbflow.cli:main"

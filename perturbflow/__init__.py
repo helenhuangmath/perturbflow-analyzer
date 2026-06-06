@@ -1,4 +1,9 @@
-"""PerturbFlow: modular workflows for Perturb-seq analysis and prediction."""
+"""PerturbFlow: open infrastructure for perturbation biology.
+
+AnnData-native, scverse-interoperable tooling for standardized analysis,
+mechanistic (rewiring-aware) interpretation, AI-ready outputs, and community
+benchmarks across Perturb-seq, CRISPR screens, and single-cell multi-omics.
+"""
 
 from __future__ import annotations
 

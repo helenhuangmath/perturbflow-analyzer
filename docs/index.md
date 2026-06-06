@@ -1,6 +1,20 @@
 # PerturbFlow
 
-PerturbFlow is a modular Perturb-seq framework. It currently ships an analyzer workflow for AnnData input, interactive reports, and agent-ready interpretation files, with a predictor namespace reserved for future perturbation response prediction models.
+**Open infrastructure for perturbation biology.**
+
+PerturbFlow is an open-source, AnnData-native platform for perturbation
+experiments — Perturb-seq, pooled CRISPR screens, and single-cell multi-omics.
+It standardizes data representation, reproducible workflows, mechanistic
+(rewiring-aware) interpretation, and AI-ready outputs, and complements the
+scverse ecosystem rather than replacing it.
+
+The project is organized around three aims — community-standard infrastructure,
+AI-ready perturbation biology, and community benchmarks. See the
+[Vision and Roadmap](vision.md) for details.
+
+The current release ships an analyzer workflow for AnnData input, interactive
+reports, and agent-ready interpretation files. The `predictor` and `benchmark`
+namespaces are reserved for the prediction and evaluation work on the roadmap.
 
 ## Core Workflow
 

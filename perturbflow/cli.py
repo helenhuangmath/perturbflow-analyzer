@@ -82,6 +82,14 @@ def cmd_predict(_args) -> None:
     )
 
 
+def cmd_benchmark(_args) -> None:
+    raise SystemExit(
+        "PerturbFlow Benchmark is reserved for community evaluation tooling "
+        "(baseline-calibrated, distance-aware, and rewiring-aware metrics) and "
+        "is not implemented yet. See ROADMAP.md (Aim 3)."
+    )
+
+
 def _add_run_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--input", required=True, help="Input .h5ad file")
     parser.add_argument("--output", required=True, help="Output directory")
@@ -98,7 +106,7 @@ def _add_run_args(parser: argparse.ArgumentParser) -> None:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="perturbflow",
-        description="Modular Perturb-seq analysis, reporting, prediction, and AI-agent handoff.",
+        description="Open infrastructure for perturbation biology: analysis, reporting, AI-agent handoff, and benchmarking.",
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
@@ -121,6 +129,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     predict = sub.add_parser("predict", help="Reserved for future perturbation response prediction")
     predict.set_defaults(func=cmd_predict)
+
+    benchmark = sub.add_parser("benchmark", help="Reserved for community evaluation/benchmarking (Aim 3)")
+    benchmark.set_defaults(func=cmd_benchmark)
 
     interpret = sub.add_parser("interpret", help="Create LLM/agent-ready interpretation files")
     interpret.add_argument("--results", required=True, help="Completed PerturbFlow result directory")
