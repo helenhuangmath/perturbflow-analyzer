@@ -70,20 +70,21 @@ def _preferred_network_font() -> str:
     return "sans-serif"
 
 # ---------------------------------------------------------------------------
-# Publication-grade colour palette (light red / green RdYlGn pair)
+# Publication-grade colour palette
 # ---------------------------------------------------------------------------
-# Static and differential panels share the same red / green motif so the whole
-# figure suite is visually coherent. Shades are taken from ColorBrewer RdYlGn
-# so they reproduce well in print.
+# Static co-expression panels use red for positive correlations and blue for
+# negative correlations. Differential panels keep red/green for gained/lost
+# edges because those are edge-status categories, not correlation signs.
 _C_RED   = "#ef8a8a"   # light red (positive correlation / gained edge)
-_C_GREEN = "#91cf60"   # light green (negative correlation / lost edge)
+_C_BLUE  = "#67a9cf"   # light blue (negative correlation)
+_C_GREEN = "#91cf60"   # light green (lost edge)
 _C_GREY  = "#cccccc"
 
 # Sign of Pearson r in static co-expression panels:
 #   positive r  → red,
-#   negative r  → green.
+#   negative r  → blue.
 _C_POS_R = _C_RED
-_C_NEG_R = _C_GREEN
+_C_NEG_R = _C_BLUE
 # Differential edge status:
 #   gained edge → red   ("added" in perturbation),
 #   lost   edge → green ("removed" in perturbation),

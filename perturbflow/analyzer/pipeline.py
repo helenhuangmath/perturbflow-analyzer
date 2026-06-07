@@ -40,8 +40,9 @@ from .utils import ensure_dir
 
 
 def _prepare_for_h5ad_write(adata):
-    # HDF5 cannot store python lists in .obs or arbitrary dicts/lists in .uns.
-    # Coerce them to strings so the write succeeds without losing information.
+    # HDF5 cannot store python lists in .obs columns. Keep .uns dictionaries
+    # intact because AnnData uses structured entries such as uns["neighbors"]
+    # during read-back.
     for col in adata.obs.columns:
         series = adata.obs[col]
         if series.dtype != object:
@@ -52,7 +53,7 @@ def _prepare_for_h5ad_write(adata):
                 lambda value: "|".join(map(str, value)) if isinstance(value, list) else value
             )
     for key, value in list(adata.uns.items()):
-        if isinstance(value, (list, dict)):
+        if isinstance(value, list):
             adata.uns[key] = json.dumps(value, default=str)
     return adata
 
@@ -79,6 +80,20 @@ def _save_checkpoint(out: Path, completed: Set[str]) -> None:
             indent=2,
         )
     )
+
+
+def _read_processed_h5ad(path: Path):
+    try:
+        import anndata as ad
+
+        return ad.read_h5ad(path)
+    except ImportError:
+        try:
+            import scanpy as sc
+
+            return sc.read_h5ad(path)
+        except ImportError as exc:
+            raise ImportError("anndata or scanpy is required to read final_adata.h5ad") from exc
 
 
 def run_pipeline(
@@ -118,7 +133,23 @@ def run_pipeline(
             return False
         return True
 
-    adata = read_data(input_path, perturbation_col=perturbation_col)
+    final_adata_path = Path(out) / "final_adata.h5ad"
+    can_reuse_final = (
+        resume
+        and final_adata_path.exists()
+        and not clear_from
+        and "preprocess" in completed
+        and "qc" not in forced
+        and "preprocess" not in forced
+    )
+    if can_reuse_final:
+        try:
+            adata = _read_processed_h5ad(final_adata_path)
+        except Exception as exc:
+            print(f"[checkpoint] could not reuse final_adata.h5ad ({exc}); reading input")
+            adata = read_data(input_path, perturbation_col=perturbation_col)
+    else:
+        adata = read_data(input_path, perturbation_col=perturbation_col)
 
     effect_df = None
     traj_df = None
@@ -297,6 +328,11 @@ def run_pipeline(
         )
         completed.add("bundle"); _save_checkpoint(out, completed)
 
-    adata = _prepare_for_h5ad_write(adata)
-    adata.write_h5ad(Path(out) / "final_adata.h5ad")
+    report_only_steps = {"report", "bundle"}
+    should_write_final = bool(set(active_steps) - report_only_steps) or "X_pca" in adata.obsm
+    if should_write_final:
+        adata = _prepare_for_h5ad_write(adata)
+        adata.write_h5ad(Path(out) / "final_adata.h5ad")
+    else:
+        print("[checkpoint] not overwriting final_adata.h5ad from report-only input")
     return adata

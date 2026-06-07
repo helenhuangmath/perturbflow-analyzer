@@ -136,7 +136,31 @@ For a new dataset, update:
 - config JSON
 - requested resources and wall time
 
-## 6. Main Outputs
+## 6. Use From Python
+
+Use `PerturbFlowAPI` when another program needs to prepare data or launch an
+analysis run directly:
+
+```python
+from perturbflow import PerturbFlowAPI
+
+api = PerturbFlowAPI(config="configs/quickstart.json", perturbation_col="perturbation")
+
+prepared = api.prepare(
+    "raw/my_data.h5ad",
+    "prepared/my_data.perturbflow.h5ad",
+    control_labels="control,NT",
+    cell_state_col="cell_type",
+)
+
+adata = api.analyze(
+    prepared,
+    "results/my_run",
+    steps=["qc", "preprocess", "deg", "report", "bundle"],
+)
+```
+
+## 7. Main Outputs
 
 After the run, open:
 
@@ -152,7 +176,7 @@ Other useful outputs:
 - `results/my_run/bundle/`: compact viewer-ready data bundle
 - `results/my_run/checkpoint.json`: completed steps for resume
 
-## 7. Expected Input Columns
+## 8. Expected Input Columns
 
 Minimum:
 

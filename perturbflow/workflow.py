@@ -29,6 +29,7 @@ def run_analysis(
     input_path: str | Path,
     output_dir: str | Path,
     config_path: str | Path | None = None,
+    config=None,
     steps: Iterable[str] | None = None,
     perturbation_col: str | None = None,
     resume: bool = True,
@@ -42,7 +43,9 @@ def run_analysis(
     from perturbflow.analyzer.config import PipelineConfig
     from perturbflow.analyzer.pipeline import run_pipeline
 
-    config = PipelineConfig.from_json(config_path) if config_path else PipelineConfig()
+    if config is not None and config_path is not None:
+        raise ValueError("Use either config or config_path, not both.")
+    config = config or (PipelineConfig.from_json(config_path) if config_path else PipelineConfig())
     return run_pipeline(
         input_path=str(input_path),
         output_dir=str(output_dir),

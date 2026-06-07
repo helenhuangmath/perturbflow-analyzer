@@ -3,6 +3,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
+from perturbflow import PerturbFlowAPI
 from perturbflow.ai import write_agent_handoff
 from perturbflow.cli import build_parser
 
@@ -13,6 +16,37 @@ def test_cli_exposes_public_commands() -> None:
     assert "prepare" in help_text
     assert "run" in help_text
     assert "interpret" in help_text
+
+
+def test_public_api_exposes_steps_from_config() -> None:
+    api = PerturbFlowAPI(config={"default_steps": ["qc", "report"]})
+
+    assert api.list_steps() == ["qc", "report"]
+
+
+def test_public_api_requires_perturbation_column_for_prepare(tmp_path: Path) -> None:
+    api = PerturbFlowAPI()
+
+    with pytest.raises(ValueError, match="perturbation_col"):
+        api.prepare(tmp_path / "input.h5ad", tmp_path / "prepared.h5ad")
+
+
+def test_public_api_analyze_passes_config_object(monkeypatch, tmp_path: Path) -> None:
+    captured = {}
+
+    def fake_run_analysis(**kwargs):
+        captured.update(kwargs)
+        return "adata"
+
+    monkeypatch.setattr("perturbflow.api.run_analysis", fake_run_analysis)
+    api = PerturbFlowAPI(config={"default_steps": ["report"]}, perturbation_col="guide")
+
+    result = api.analyze(tmp_path / "input.h5ad", tmp_path / "out", resume=False)
+
+    assert result == "adata"
+    assert captured["perturbation_col"] == "guide"
+    assert captured["resume"] is False
+    assert captured["config"].default_steps == ["report"]
 
 
 def test_agent_handoff_writes_expected_files(tmp_path: Path) -> None:

@@ -26,6 +26,34 @@ from __future__ import annotations
 import numpy as np
 
 
+def _has_informative_cell_state(adata) -> bool:
+    if "cell_state" not in adata.obs.columns:
+        return False
+    states = adata.obs["cell_state"].astype(str)
+    states = states[~states.str.lower().isin(["", "nan", "none"])]
+    return states.nunique() > 1
+
+
+def _ensure_informative_cell_state(adata, random_state: int) -> None:
+    if _has_informative_cell_state(adata) or "X_pca" not in adata.obsm:
+        return
+    x_pca = adata.obsm["X_pca"]
+    if adata.n_obs < 4 or x_pca.shape[1] < 1:
+        return
+    n_clusters = min(6, max(2, adata.n_obs // 80))
+    try:
+        from sklearn.cluster import KMeans
+
+        km = KMeans(n_clusters=n_clusters, random_state=random_state, n_init=10)
+        adata.obs["cell_state"] = km.fit_predict(x_pca).astype(str)
+    except Exception:
+        order = np.argsort(x_pca[:, 0])
+        labels = np.zeros(adata.n_obs, dtype=int)
+        for label, idx in enumerate(np.array_split(order, n_clusters)):
+            labels[idx] = label
+        adata.obs["cell_state"] = labels.astype(str)
+
+
 def normalize_and_embed(adata, random_state=0, leiden_resolution=0.5):
     # Normalise expression, compute PCA, UMAP, and cell-state clusters.
     #
@@ -35,6 +63,7 @@ def normalize_and_embed(adata, random_state=0, leiden_resolution=0.5):
     #
     # Returns the modified AnnData with obsm keys X_pca, X_bio, X_perturb_resid
     # (and X_umap when scanpy is used) plus obs column cell_state.
+    keep_input_cell_state = _has_informative_cell_state(adata)
     try:
         import scanpy as sc
 
@@ -50,8 +79,9 @@ def normalize_and_embed(adata, random_state=0, leiden_resolution=0.5):
         # Build kNN graph and embed in 2-D UMAP for visualisation.
         sc.pp.neighbors(adata, use_rep="X_pca", n_neighbors=15)
         sc.tl.umap(adata, random_state=random_state)
-        # Leiden community detection defines cell states used in effect decomposition.
-        sc.tl.leiden(adata, key_added="cell_state", resolution=leiden_resolution)
+        # Keep user-provided states when available; otherwise use Leiden states.
+        leiden_key = "leiden_cell_state" if keep_input_cell_state else "cell_state"
+        sc.tl.leiden(adata, key_added=leiden_key, resolution=leiden_resolution)
     except Exception:
         # Fallback: sklearn-only path (no scanpy dependency).
         from sklearn.decomposition import PCA
@@ -62,9 +92,26 @@ def normalize_and_embed(adata, random_state=0, leiden_resolution=0.5):
         x = x - x.mean(axis=0, keepdims=True)  # centre genes
         pca = PCA(n_components=min(30, x.shape[1] - 1, x.shape[0] - 1), random_state=random_state)
         adata.obsm["X_pca"] = pca.fit_transform(x)
+        if adata.obsm["X_pca"].shape[1] >= 2:
+            adata.obsm["X_umap"] = adata.obsm["X_pca"][:, :2].copy()
+        else:
+            adata.obsm["X_umap"] = np.column_stack(
+                [adata.obsm["X_pca"][:, 0], np.zeros(adata.n_obs)]
+            )
         # Use KMeans as a substitute for Leiden clustering.
         km = KMeans(n_clusters=min(10, max(2, adata.n_obs // 50)), random_state=random_state, n_init=10)
-        adata.obs["cell_state"] = km.fit_predict(adata.obsm["X_pca"]).astype(str)
+        cluster_key = "kmeans_cell_state" if keep_input_cell_state else "cell_state"
+        adata.obs[cluster_key] = km.fit_predict(adata.obsm["X_pca"]).astype(str)
+
+    if "X_umap" not in adata.obsm and "X_pca" in adata.obsm:
+        if adata.obsm["X_pca"].shape[1] >= 2:
+            adata.obsm["X_umap"] = adata.obsm["X_pca"][:, :2].copy()
+        else:
+            adata.obsm["X_umap"] = np.column_stack(
+                [adata.obsm["X_pca"][:, 0], np.zeros(adata.n_obs)]
+            )
+
+    _ensure_informative_cell_state(adata, random_state=random_state)
 
     # X_bio is a copy of the biological PCA embedding kept separate from X_perturb_resid.
     adata.obsm["X_bio"] = adata.obsm["X_pca"].copy()

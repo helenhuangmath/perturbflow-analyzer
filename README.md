@@ -162,6 +162,35 @@ perturbflow list-steps   # Show available pipeline steps
 
 The historical `perturbscope` command remains available for compatibility.
 
+## Python API
+
+Other programs can run PerturbFlow without shelling out to the CLI:
+
+```python
+from perturbflow import PerturbFlowAPI
+
+api = PerturbFlowAPI(
+    config="configs/quickstart.json",
+    perturbation_col="perturbation",
+)
+
+prepared = api.prepare(
+    input_path="raw/my_data.h5ad",
+    output_path="prepared/my_data.perturbflow.h5ad",
+    control_labels="control,NT",
+    cell_state_col="cell_type",
+)
+
+adata = api.analyze(
+    input_path=prepared,
+    output_dir="results/my_run",
+    steps=["qc", "preprocess", "deg", "report", "bundle"],
+)
+```
+
+For already standardized data, call `api.analyze(...)` directly. Use
+`api.list_steps()` to inspect the configured default workflow.
+
 ## Pipeline Steps
 
 Default analysis steps include:

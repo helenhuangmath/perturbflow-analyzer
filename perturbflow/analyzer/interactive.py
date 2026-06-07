@@ -134,6 +134,48 @@ def _clean_record(row: dict) -> dict:
     return out
 
 
+def _state_matrix_has_signal(state_data: dict) -> bool:
+    matrix = state_data.get("matrix") or []
+    cell_states = state_data.get("cell_states") or []
+    if len(cell_states) < 2 or not matrix:
+        return False
+    vals: list[float] = []
+    for row in matrix:
+        for value in row:
+            safe = _safe_float(value)
+            if safe is not None:
+                vals.append(abs(float(safe)))
+    return bool(vals) and max(vals) > 1e-9
+
+
+def _cluster_proportion_state_data(csv_dir: Path) -> dict:
+    cp_path = csv_dir / "eda_cluster_proportions.csv"
+    if not cp_path.exists():
+        return {}
+    try:
+        cp_df = pd.read_csv(cp_path, index_col=0)
+        if "control" not in cp_df.index:
+            return {}
+        ctrl_row = cp_df.loc["control"]
+        pert_df = cp_df.drop("control")
+        ratio_df = np.log2((pert_df + 0.01) / (ctrl_row.values + 0.01))
+        return {
+            "perturbations": ratio_df.index.tolist(),
+            "cell_states": ["Cluster " + str(c) for c in ratio_df.columns.tolist()],
+            "matrix": [[round(float(v), 3) for v in row] for row in ratio_df.values],
+            "_is_fallback": True,
+        }
+    except Exception:
+        return {}
+
+
+def _png_data_uri(path: Path) -> str | None:
+    if not path.exists():
+        return None
+    payload = base64.b64encode(path.read_bytes()).decode("ascii")
+    return f"data:image/png;base64,{payload}"
+
+
 # ---------------------------------------------------------------------------
 # Data extraction
 # ---------------------------------------------------------------------------
@@ -300,33 +342,36 @@ def _extract_data(adata, csv_dir: Path, n_top_genes: int, max_cells_per_group: i
         "umap_state":   "umap_cell_state.png",
         "cluster_summary":        "eda_gene_pert_cluster_summary_heatmap.png",
     }
-    # Static PNGs — store relative paths so the browser loads them lazily
-    # from the sibling plots/ folder instead of base64-embedding ~30 large
-    # images into the HTML. Field names are kept (heatmap_b64 / genenet_b64
-    # / eda_corr_pert) for backward compat with the JS bindings.
+    # Static PNGs are embedded as data URIs so the interactive report remains
+    # portable when opened directly from disk or moved without its sidecars.
+    # Field names are kept (heatmap_b64 / genenet_b64 / eda_corr_pert) for
+    # backward compatibility with the JS bindings.
     data["heatmap_b64"] = {}
     plots_dir = csv_dir.parent / "plots"
     for key, fname in hm_names.items():
         p = plots_dir / fname
-        if p.exists():
-            data["heatmap_b64"][key] = f"plots/{fname}"
+        src = _png_data_uri(p)
+        if src:
+            data["heatmap_b64"][key] = src
 
     data["genenet_b64"] = {"control_heatmap": None, "control_network": None, "perturbations": {}}
     ctrl_hm = plots_dir / "genenet_control_heatmap.png"
-    if ctrl_hm.exists():
-        data["genenet_b64"]["control_heatmap"] = f"plots/{ctrl_hm.name}"
+    ctrl_hm_src = _png_data_uri(ctrl_hm)
+    if ctrl_hm_src:
+        data["genenet_b64"]["control_heatmap"] = ctrl_hm_src
     ctrl_net = plots_dir / "genenet_control_network.png"
-    if ctrl_net.exists():
-        data["genenet_b64"]["control_network"] = f"plots/{ctrl_net.name}"
+    ctrl_net_src = _png_data_uri(ctrl_net)
+    if ctrl_net_src:
+        data["genenet_b64"]["control_network"] = ctrl_net_src
     # Per-pert single-axis network plots (preferred, square layout).
     for net_path in sorted(plots_dir.glob("genenet_*_pert_network.png")):
         pert = net_path.stem.replace("genenet_", "").replace("_pert_network", "")
         data["genenet_b64"]["perturbations"].setdefault(pert, {})
-        data["genenet_b64"]["perturbations"][pert]["pert_network"] = f"plots/{net_path.name}"
+        data["genenet_b64"]["perturbations"][pert]["pert_network"] = _png_data_uri(net_path)
     for net_path in sorted(plots_dir.glob("genenet_*_ctrl_network.png")):
         pert = net_path.stem.replace("genenet_", "").replace("_ctrl_network", "")
         data["genenet_b64"]["perturbations"].setdefault(pert, {})
-        data["genenet_b64"]["perturbations"][pert]["ctrl_network"] = f"plots/{net_path.name}"
+        data["genenet_b64"]["perturbations"][pert]["ctrl_network"] = _png_data_uri(net_path)
     # Legacy combined ctrl+pert network (kept as fallback for old runs).
     for net_path in sorted(plots_dir.glob("genenet_*_network.png")):
         if net_path.name.endswith("_pert_network.png") or net_path.name.endswith("_ctrl_network.png") \
@@ -334,21 +379,23 @@ def _extract_data(adata, csv_dir: Path, n_top_genes: int, max_cells_per_group: i
             continue
         pert = net_path.stem.replace("genenet_", "").replace("_network", "")
         data["genenet_b64"]["perturbations"].setdefault(pert, {})
-        data["genenet_b64"]["perturbations"][pert]["network"] = f"plots/{net_path.name}"
+        data["genenet_b64"]["perturbations"][pert]["network"] = _png_data_uri(net_path)
     for diff_path in sorted(plots_dir.glob("genenet_*_diff_network.png")):
         pert = diff_path.stem.replace("genenet_", "").replace("_diff_network", "")
         data["genenet_b64"]["perturbations"].setdefault(pert, {})
-        data["genenet_b64"]["perturbations"][pert]["diff"] = f"plots/{diff_path.name}"
+        data["genenet_b64"]["perturbations"][pert]["diff"] = _png_data_uri(diff_path)
     for hm_path in sorted(plots_dir.glob("genenet_*_heatmap_comparison.png")):
         pert = hm_path.stem.replace("genenet_", "").replace("_heatmap_comparison", "")
         data["genenet_b64"]["perturbations"].setdefault(pert, {})
-        data["genenet_b64"]["perturbations"][pert]["heatmap"] = f"plots/{hm_path.name}"
+        data["genenet_b64"]["perturbations"][pert]["heatmap"] = _png_data_uri(hm_path)
 
     # Per-perturbation gene–gene correlation heatmaps from eda step
     data["eda_corr_pert"] = {}
     for cp in sorted(plots_dir.glob("eda_gene_corr_vs_*.png")):
         pert = cp.stem.replace("eda_gene_corr_vs_", "")
-        data["eda_corr_pert"][pert] = f"plots/{cp.name}"
+        src = _png_data_uri(cp)
+        if src:
+            data["eda_corr_pert"][pert] = src
 
     # Interactive perturbation similarity matrix. Prefer the bundled cosine
     # similarity when available; otherwise the static PNG remains the fallback.
@@ -414,24 +461,12 @@ def _extract_data(adata, csv_dir: Path, n_top_genes: int, max_cells_per_group: i
             }
         except Exception:
             pass
-    # Fallback: cluster proportions log2FC vs control
-    if not data["state_enrich"]:
-        cp_path = csv_dir / "eda_cluster_proportions.csv"
-        if cp_path.exists():
-            try:
-                cp_df = pd.read_csv(cp_path, index_col=0)
-                if "control" in cp_df.index:
-                    ctrl_row = cp_df.loc["control"]
-                    pert_df = cp_df.drop("control")
-                    ratio_df = np.log2((pert_df + 0.01) / (ctrl_row.values + 0.01))
-                    data["state_enrich"] = {
-                        "perturbations": ratio_df.index.tolist(),
-                        "cell_states": ["Cluster " + str(c) for c in ratio_df.columns.tolist()],
-                        "matrix": [[round(float(v), 3) for v in row] for row in ratio_df.values],
-                        "_is_fallback": True,
-                    }
-            except Exception:
-                pass
+    # Fallback: cluster proportions log2FC vs control. Use it when the formal
+    # enrichment matrix is absent or visually uninformative.
+    if not _state_matrix_has_signal(data["state_enrich"]):
+        fallback_state = _cluster_proportion_state_data(csv_dir)
+        if _state_matrix_has_signal(fallback_state):
+            data["state_enrich"] = fallback_state
 
     # ── Perturbation effect correlation (regulatory step) ─────────────────────
     data["pert_corr_before"] = {}
@@ -521,8 +556,9 @@ def _extract_data(adata, csv_dir: Path, n_top_genes: int, max_cells_per_group: i
     }
     for key, fname in cscore_png_map.items():
         p = plots_dir / fname
-        if p.exists():
-            data["cscore"]["b64"][key] = f"plots/{fname}"
+        src = _png_data_uri(p)
+        if src:
+            data["cscore"]["b64"][key] = src
 
     return data
 
@@ -538,7 +574,7 @@ def _html_template() -> str:
         '<head>\n'
         '<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-        '<title>PerturbFlow Analyzer \u2014 Interactive Report</title>\n'
+        '<title>PerturbFlow \u2014 Interactive Report</title>\n'
         '<style>\n'
         ':root{'
         # GEPIA-inspired dark-navy palette: deep navy primary, lighter blue
@@ -573,12 +609,18 @@ def _html_template() -> str:
         '.sidebar button.active{background:var(--accent);color:#fff;font-weight:600;}\n'
         '.content{flex:1;overflow-y:auto;padding:24px 28px;}\n'
         '.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);'
-        'margin-bottom:22px;flex-wrap:wrap;}\n'
-        '.tab-btn{background:none;border:none;border-bottom:3px solid transparent;'
-        'color:var(--muted);padding:10px 22px;cursor:pointer;font-size:18px;font-weight:600;'
+        'margin-bottom:22px;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;}\n'
+        '.tab-btn{background:none;border:none;border-bottom:3px solid transparent;flex:0 0 auto;'
+        'color:var(--muted);padding:10px 12px;cursor:pointer;font-size:15px;font-weight:600;'
         'transition:color .15s,border-color .15s;}\n'
         '.tab-btn:hover{color:var(--text);}\n'
         '.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}\n'
+        '.main-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px;}\n'
+        '.main-tab{background:#fff;border:1px solid var(--border);border-radius:6px;padding:14px 18px;'
+        'text-align:left;cursor:pointer;color:var(--muted);font-size:15px;font-weight:700;}\n'
+        '.main-tab span{display:block;font-size:12px;font-weight:500;margin-top:4px;color:#6b7c8f;line-height:1.35;}\n'
+        '.main-tab.active{border-color:var(--accent);background:#eef6ff;color:var(--accent);box-shadow:inset 0 3px 0 var(--accent);}\n'
+        '.main-tab:hover{border-color:var(--accent);}\n'
         '.tab-pane{display:none;}.tab-pane.active{display:block;}\n'
         '.cards{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:22px;}\n'
         '.card{background:var(--card-bg);border:1px solid var(--border);border-radius:6px;'
@@ -636,6 +678,31 @@ def _html_template() -> str:
         '.param-table td{padding:7px 12px;border-bottom:1px solid var(--border);}\n'
         '.param-table td.pn{color:var(--accent);font-family:monospace;font-size:13px;}\n'
         '.param-table td.pv{color:var(--accent2);font-family:monospace;font-size:13px;}\n'
+        '.browser-shell{display:grid;grid-template-columns:320px minmax(0,1fr);gap:18px;align-items:start;}\n'
+        '.browser-panel{background:#fff;border:1px solid var(--border);border-radius:6px;padding:16px;}\n'
+        '.browser-panel h3{margin-top:0;font-size:14px;color:var(--text);}\n'
+        '.browser-field{margin-bottom:12px;}\n'
+        '.browser-field label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em;}\n'
+        '.browser-field select,.browser-field input{width:100%;margin-bottom:0;}\n'
+        '.browser-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}\n'
+        '.browser-actions button,.mini-btn{background:var(--tab-active);border:1px solid var(--border);border-radius:6px;color:var(--accent);padding:8px 10px;cursor:pointer;font-size:13px;}\n'
+        '.browser-actions button:hover,.mini-btn:hover{border-color:var(--accent);background:#fff;}\n'
+        '.browser-stage{background:#fff;border:1px solid var(--border);border-radius:6px;min-height:720px;overflow:hidden;}\n'
+        '.browser-toolbar{display:flex;gap:10px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);padding:10px 14px;background:#fbfdff;}\n'
+        '.browser-toolbar strong{font-size:14px;color:var(--text);}\n'
+        '.browser-chart{height:650px;}\n'
+        '.browser-kv{display:grid;grid-template-columns:1fr auto;gap:6px 12px;font-size:13px;}\n'
+        '.browser-kv span:nth-child(odd){color:var(--muted);}\n'
+        '.browser-kv span:nth-child(even){font-weight:700;color:var(--text);}\n'
+        '.browser-note{font-size:12px;color:var(--muted);line-height:1.5;margin-top:10px;}\n'
+        '.app-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:18px 0;}\n'
+        '.app-card{background:#fff;border:1px solid var(--border);border-radius:6px;padding:18px;}\n'
+        '.app-card h3{font-size:15px;margin:0 0 8px;color:var(--text);}\n'
+        '.app-card p{font-size:13px;line-height:1.6;color:#405568;margin:0;}\n'
+        '.app-card ul{margin:8px 0 0;padding-left:18px;font-size:13px;line-height:1.7;color:#405568;}\n'
+        '.code-block{background:#10263b;color:#eef7ff;border-radius:6px;padding:14px 16px;overflow-x:auto;font-size:13px;line-height:1.55;}\n'
+        '.status-pill{display:inline-block;border:1px solid var(--border);border-radius:999px;padding:4px 10px;font-size:12px;font-weight:700;color:var(--accent);background:var(--tab-active);}\n'
+        '@media(max-width:980px){.browser-shell{grid-template-columns:1fr}.browser-chart{height:520px}.browser-actions{grid-template-columns:1fr}}\n'
         '::-webkit-scrollbar{width:6px;height:6px;}\n'
         '::-webkit-scrollbar-track{background:transparent;}\n'
         '::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}\n'
@@ -644,13 +711,14 @@ def _html_template() -> str:
         '</head>\n'
         '<body>\n'
         '<header>\n'
-        '  <h1>PerturbFlow Analyzer</h1>\n'
+        '  <h1>PerturbFlow</h1>\n'
         '  <span id="hdr-summary">Loading\u2026</span>\n'
         '</header>\n'
         '<div class="layout">\n'
         '<aside class="sidebar">\n'
         '  <h3>Navigate</h3>\n'
-        '  <button class="active" onclick="showTab(\'home\',this)">Summary</button>\n'
+        '  <button class="active" onclick="showTab(\'explorer\',this)">Explorer</button>\n'
+        '  <button onclick="showTab(\'home\',this)">Summary</button>\n'
         '  <button onclick="showTab(\'qc\',this)">QC</button>\n'
         '  <button onclick="showTab(\'heatmaps\',this)">Heatmaps</button>\n'
         '  <button onclick="showTab(\'pert\',this)">Perturbation</button>\n'
@@ -671,8 +739,14 @@ def _html_template() -> str:
         '  <div id="sb-gene-list" style="max-height:160px;overflow-y:auto;"></div>\n'
         '</aside>\n'
         '<main class="content">\n'
-        '  <div class="tabs">\n'
-        '    <button class="tab-btn active" onclick="showTab(\'home\',null,\'tab\')">Summary</button>\n'
+        '  <div class="main-tabs">\n'
+        '    <button class="main-tab active" data-app="analyzer" onclick="showAppSection(\'analyzer\')">Analyzer<span>Explore cells, perturbations, genes, networks, states, and reports.</span></button>\n'
+        '    <button class="main-tab" data-app="predictor" onclick="showAppSection(\'predictor\')">Predictor<span>Prediction workflow, expected model inputs, and planned outputs.</span></button>\n'
+        '    <button class="main-tab" data-app="api" onclick="showAppSection(\'api\')">API<span>Python interface for notebooks, workflow engines, and services.</span></button>\n'
+        '  </div>\n'
+        '  <div class="tabs" id="analyzer-tabs">\n'
+        '    <button class="tab-btn active" onclick="showTab(\'explorer\',null,\'tab\')">Explorer</button>\n'
+        '    <button class="tab-btn" onclick="showTab(\'home\',null,\'tab\')">Summary</button>\n'
         '    <button class="tab-btn" onclick="showTab(\'qc\',null,\'tab\')">QC</button>\n'
         '    <button class="tab-btn" onclick="showTab(\'heatmaps\',null,\'tab\')">Heatmaps</button>\n'
         '    <button class="tab-btn" onclick="showTab(\'pert\',null,\'tab\')">Perturbation</button>\n'
@@ -682,17 +756,21 @@ def _html_template() -> str:
         '    <button class="tab-btn" onclick="showTab(\'cscore\',null,\'tab\')">C-Score</button>\n'
         '    <button class="tab-btn" onclick="showTab(\'regulatory\',null,\'tab\')">Regulatory</button>\n'
         '  </div>\n'
+        + _TAB_EXPLORER
         + _TAB_HOME
         + _TAB_QC
         + _TAB_HEATMAPS
         + _TAB_PERT
+        + _TAB_PREDICTOR
         + _TAB_NETWORK
         + _TAB_GENE
         + _TAB_STATES
         + _TAB_CSCORE
         + _TAB_REGULATORY
+        + _TAB_API
         + '</main>\n'
         '</div>\n'
+        '<script>{PLOTLY_STUB}</script>\n'
         '<script>\n'
         'let D = {DATA_STUB};\n'
         + _JS_BODY
@@ -702,8 +780,7 @@ def _html_template() -> str:
     )
 
 
-def _copy_plotly_bundle(out: Path) -> None:
-    """Place Plotly next to the report so it opens without internet access."""
+def _plotly_bundle_source() -> Path | None:
     candidates: list[Path] = []
     try:
         import plotly  # type: ignore
@@ -717,14 +794,72 @@ def _copy_plotly_bundle(out: Path) -> None:
     ])
     for src in candidates:
         if src.exists():
-            dst = out / "plotly.min.js"
-            if not dst.exists() or dst.stat().st_size != src.stat().st_size:
-                shutil.copy2(src, dst)
-            return
+            return src
+    return None
 
+
+def _copy_plotly_bundle(out: Path) -> str:
+    """Place Plotly next to the report and return inline JS for portability."""
+    src = _plotly_bundle_source()
+    if not src:
+        return ""
+    dst = out / "plotly.min.js"
+    if not dst.exists() or dst.stat().st_size != src.stat().st_size:
+        shutil.copy2(src, dst)
+    return src.read_text(encoding="utf-8").replace("</script", "<\\/script")
+
+
+_TAB_EXPLORER = (
+    '<div class="tab-pane active" id="tab-explorer">\n'
+    '  <div class="browser-shell">\n'
+    '    <section class="browser-panel">\n'
+    '      <h2 style="margin-bottom:12px;">Cell Explorer</h2>\n'
+    '      <div class="browser-field">\n'
+    '        <label>Color cells by</label>\n'
+    '        <select id="explorer-color-by" onchange="renderExplorer()">\n'
+    '          <option value="perturbation">Perturbation</option>\n'
+    '          <option value="state">Cell state</option>\n'
+    '          <option value="score">Perturbation score</option>\n'
+    '          <option value="gene">Gene expression</option>\n'
+    '        </select>\n'
+    '      </div>\n'
+    '      <div class="browser-field" id="explorer-gene-field" style="display:none;">\n'
+    '        <label>Gene</label>\n'
+    '        <input id="explorer-gene-input" list="explorer-gene-list" placeholder="Search gene..." oninput="debounceExplorer()">\n'
+    '        <datalist id="explorer-gene-list"></datalist>\n'
+    '      </div>\n'
+    '      <div class="browser-field">\n'
+    '        <label>Focus perturbation</label>\n'
+    '        <select id="explorer-pert-filter" onchange="renderExplorer()"></select>\n'
+    '      </div>\n'
+    '      <div class="browser-actions">\n'
+    '        <button onclick="openExplorerPerturbation()">Open perturbation</button>\n'
+    '        <button onclick="openExplorerGene()">Open gene</button>\n'
+    '      </div>\n'
+    '      <hr style="border:none;border-top:1px solid var(--border);margin:16px 0;">\n'
+    '      <h3>Selection</h3>\n'
+    '      <div class="browser-kv" id="explorer-selection-summary"></div>\n'
+    '      <p class="browser-note">Use box or lasso select on the UMAP to summarize selected cells. Gene coloring loads only the embedded quick-view genes to keep the report portable.</p>\n'
+    '      <hr style="border:none;border-top:1px solid var(--border);margin:16px 0;">\n'
+    '      <h3>Dataset</h3>\n'
+    '      <div class="browser-kv" id="explorer-dataset-summary"></div>\n'
+    '    </section>\n'
+    '    <section class="browser-stage">\n'
+    '      <div class="browser-toolbar">\n'
+    '        <strong id="explorer-title">UMAP</strong>\n'
+    '        <div style="display:flex;gap:8px;align-items:center;">\n'
+    '          <button class="mini-btn" onclick="downloadExplorerSelection()">Download selection</button>\n'
+    '          <button class="mini-btn" onclick="renderExplorer()">Reset view</button>\n'
+    '        </div>\n'
+    '      </div>\n'
+    '      <div class="browser-chart" id="explorer-chart"></div>\n'
+    '    </section>\n'
+    '  </div>\n'
+    '</div>\n'
+)
 
 _TAB_HOME = (
-    '<div class="tab-pane active" id="tab-home">\n'
+    '<div class="tab-pane" id="tab-home">\n'
     '  <h2>Dataset Summary</h2>\n'
     '  <div class="cards" id="home-cards"></div>\n'
     '  <h3>Analysis Summary</h3>\n'
@@ -1015,6 +1150,37 @@ _TAB_STATES = (
     '</div>\n'
 )
 
+_TAB_PREDICTOR = (
+    '<div class="tab-pane" id="tab-predictor">\n'
+    '  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">\n'
+    '    <h2 style="margin-bottom:4px;">PerturbFlow Predictor</h2>\n'
+    '    <span class="status-pill">Planned module</span>\n'
+    '  </div>\n'
+    '  <p style="max-width:920px;">Prediction will use completed analyzer outputs as training-ready features: perturbation effects, DEG signatures, cell-state shifts, C-score rewiring, and regulatory summaries. This page documents the interface expected by downstream predictor code while the model layer is developed.</p>\n'
+    '  <div class="app-grid">\n'
+    '    <div class="app-card"><h3>Inputs</h3><ul>'
+    '      <li>Prepared AnnData with standardized perturbation labels.</li>'
+    '      <li>Analyzer bundle with DEG, state, regulatory, and network tables.</li>'
+    '      <li>Optional target perturbations or held-out gene sets.</li>'
+    '    </ul></div>\n'
+    '    <div class="app-card"><h3>Prediction Tasks</h3><ul>'
+    '      <li>Rank perturbations by expected response strength.</li>'
+    '      <li>Predict direction of expression programs or cell-state shifts.</li>'
+    '      <li>Prioritize perturbations with large network rewiring.</li>'
+    '    </ul></div>\n'
+    '    <div class="app-card"><h3>Outputs</h3><ul>'
+    '      <li>Prediction table with score, rank, and feature attribution columns.</li>'
+    '      <li>Per-perturbation summaries for review in this report.</li>'
+    '      <li>Portable CSV/JSON files for external validation.</li>'
+    '    </ul></div>\n'
+    '  </div>\n'
+    '  <div class="app-card">\n'
+    '    <h3>Python entry point</h3>\n'
+    '    <pre class="code-block">from perturbflow import PerturbFlowAPI\n\napi = PerturbFlowAPI(config="configs/quickstart.json")\nadata = api.analyze(\n    input_path="prepared/my_data.perturbflow.h5ad",\n    output_dir="results/my_run",\n    steps=["qc", "preprocess", "deg", "cscore", "regulatory", "bundle"],\n)\n\n# Predictor model hooks will consume results/my_run/bundle/ and final_adata.h5ad.</pre>\n'
+    '  </div>\n'
+    '</div>\n'
+)
+
 _TAB_REGULATORY = (
     '<div class="tab-pane" id="tab-regulatory">\n'
     '  <h2>Regulatory Analysis</h2>\n'
@@ -1205,7 +1371,7 @@ _TAB_CSCORE = (
     ' (new edges gained), C_loss (edges lost), and C_shift'
     ' (weight change on preserved edges). C_total = C_gain + C_loss + C_shift.</p>\n'
     '  <div class="cards" id="cscore-cards" style="margin-bottom:22px;"></div>\n'
-    '  <div style="display:grid;grid-template-columns:1fr;gap:22px;margin-bottom:22px;">\n'
+    '  <div style="display:grid;grid-template-columns:repeat(2,minmax(360px,1fr));gap:22px;margin-bottom:22px;">\n'
     '    <div class="hm-card">\n'
     '      <h3 style="font-size:17px;margin-top:0;">Perturbations Ranked by C_total</h3>\n'
     '      <p style="font-size:13px;color:var(--muted);margin-bottom:8px;">'
@@ -1265,8 +1431,30 @@ _TAB_CSCORE = (
     '</div>\n'
 )
 
+_TAB_API = (
+    '<div class="tab-pane" id="tab-api">\n'
+    '  <h2>PerturbFlow API</h2>\n'
+    '  <p style="max-width:920px;">Use the Python API when another script, notebook, workflow manager, or web service needs to prepare data, run analysis, or rebuild reports without shell commands.</p>\n'
+    '  <div class="app-grid">\n'
+    '    <div class="app-card"><h3>Prepare</h3><p>Standardize a user AnnData file so downstream steps see the same perturbation, control, and cell-state fields.</p></div>\n'
+    '    <div class="app-card"><h3>Analyze</h3><p>Run selected pipeline steps and return the final AnnData object for direct use in Python.</p></div>\n'
+    '    <div class="app-card"><h3>Automate</h3><p>Embed PerturbFlow in Snakemake, Nextflow, notebooks, services, or lab-specific batch scripts.</p></div>\n'
+    '  </div>\n'
+    '  <div class="app-card" style="margin-bottom:16px;">\n'
+    '    <h3>Prepare and analyze</h3>\n'
+    '    <pre class="code-block">from perturbflow import PerturbFlowAPI\n\napi = PerturbFlowAPI(\n    config="configs/quickstart.json",\n    perturbation_col="perturbation",\n)\n\nprepared = api.prepare(\n    input_path="raw/my_data.h5ad",\n    output_path="prepared/my_data.perturbflow.h5ad",\n    control_labels="control,NT",\n    cell_state_col="cell_type",\n)\n\nadata = api.analyze(\n    input_path=prepared,\n    output_dir="results/my_run",\n    steps=["qc", "preprocess", "deg", "report", "bundle"],\n)</pre>\n'
+    '  </div>\n'
+    '  <div class="app-card">\n'
+    '    <h3>Run directly on standardized data</h3>\n'
+    '    <pre class="code-block">from perturbflow import PerturbFlowAPI\n\napi = PerturbFlowAPI(config={"default_steps": ["qc", "preprocess", "deg", "report"]})\nadata = api.analyze(\n    input_path="prepared/my_data.perturbflow.h5ad",\n    output_dir="results/api_run",\n    resume=True,\n)</pre>\n'
+    '  </div>\n'
+    '</div>\n'
+)
+
 _JS_BODY = r"""
 const _tabInit = {};
+const ANALYZER_TABS = new Set(['explorer','home','qc','heatmaps','pert','network','gene','states','cscore','regulatory']);
+let _lastAnalyzerTab = 'explorer';
 let _dataReady=null;
 function emptyDataStub(){
   return {
@@ -1329,6 +1517,14 @@ function showTab(name, btnEl, src) {
   document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.sidebar button').forEach(el => el.classList.remove('active'));
+  const isAnalyzer = ANALYZER_TABS.has(name);
+  if(isAnalyzer) _lastAnalyzerTab = name;
+  const analyzerTabs = document.getElementById('analyzer-tabs');
+  if(analyzerTabs) analyzerTabs.style.display = isAnalyzer ? 'flex' : 'none';
+  document.querySelectorAll('.main-tab').forEach(el => el.classList.remove('active'));
+  const appName = isAnalyzer ? 'analyzer' : name;
+  const appBtn = document.querySelector('.main-tab[data-app="'+appName+'"]');
+  if(appBtn) appBtn.classList.add('active');
   const pane = document.getElementById('tab-' + name);
   if (pane) pane.classList.add('active');
   document.querySelectorAll('.tab-btn').forEach(b => {
@@ -1338,6 +1534,11 @@ function showTab(name, btnEl, src) {
     if ((b.dataset && b.dataset.tab === name) || (b.getAttribute('onclick')||'').includes("'"+name+"'")) b.classList.add('active');
   });
   if (!_tabInit[name]) { _tabInit[name] = true; _initTab(name); }
+}
+function showAppSection(name){
+  if(name==='analyzer') showTab(_lastAnalyzerTab || 'explorer', null, 'main');
+  else if(name==='predictor') showTab('predictor', null, 'main');
+  else if(name==='api') showTab('api', null, 'main');
 }
 function bindTabButtons(){
   document.querySelectorAll('button[onclick^="showTab("]').forEach(btn=>{
@@ -1354,15 +1555,25 @@ function bindTabButtons(){
   });
 }
 function _initTab(n) {
+  if (n==='explorer')   ensurePlotly(initExplorerTab);
   if (n==='home')       renderHome();
   if (n==='qc')         ensurePlotly(renderQC);
   if (n==='heatmaps')   renderHeatmaps();
   if (n==='pert')       ensurePlotly(initPertTab);
+  if (n==='predictor')  renderInfoTab('Predictor');
   if (n==='network')    ensurePlotly(initNetworkTab);
   if (n==='gene')       ensurePlotly(initGeneTab);
   if (n==='states')     ensurePlotly(renderStateEnrich);
   if (n==='regulatory') ensurePlotly(initRegulatoryTab);
   if (n==='cscore')     ensurePlotly(initCscoreTab);
+  if (n==='api')        renderInfoTab('API');
+}
+
+function renderInfoTab(label){
+  const hdr=document.getElementById('hdr-summary');
+  if(hdr && D && D.summary){
+    hdr.textContent=D.summary.n_cells.toLocaleString()+' cells \u00b7 '+D.summary.n_genes.toLocaleString()+' genes \u00b7 '+D.summary.n_perturbations.toLocaleString()+' perturbations';
+  }
 }
 
 const BL = {
@@ -1438,6 +1649,157 @@ function renderCardSet(id,cards){
     +(c.sub?'<div class="label" style="margin-top:4px;">'+c.sub+'</div>':'')+'</div>').join('');
 }
 
+/* EXPLORER */
+let _explorerDebounce=null;
+let _explorerSelected=[];
+function initExplorerTab(){
+  const hdr=document.getElementById('hdr-summary');
+  if(hdr) hdr.textContent=D.summary.n_cells.toLocaleString()+' cells \u00b7 '+D.summary.n_genes.toLocaleString()+' genes \u00b7 '+D.summary.n_perturbations.toLocaleString()+' perturbations';
+  const gl=document.getElementById('explorer-gene-list');
+  if(gl) gl.innerHTML=(D.umap_genes||D.genes||[]).map(g=>'<option value="'+g+'"></option>').join('');
+  const gf=document.getElementById('explorer-gene-input');
+  if(gf && !gf.value && (D.umap_genes||[]).length) gf.value=D.umap_genes[0];
+  const pf=document.getElementById('explorer-pert-filter');
+  if(pf){
+    const perts=(D.perturbations||[]).filter(Boolean);
+    pf.innerHTML='<option value="__all__">All perturbations</option>'+perts.map(p=>'<option value="'+String(p).replace(/"/g,'&quot;')+'">'+p+'</option>').join('');
+  }
+  const ds=document.getElementById('explorer-dataset-summary');
+  if(ds){
+    ds.innerHTML=[
+      ['Cells',D.summary.n_cells.toLocaleString()],
+      ['Genes',D.summary.n_genes.toLocaleString()],
+      ['Perturbations',D.summary.n_perturbations.toLocaleString()],
+      ['Embedded UMAP cells',(D.umap||[]).length.toLocaleString()],
+      ['Quick genes',(D.umap_genes||[]).length.toLocaleString()]
+    ].map(r=>'<span>'+r[0]+'</span><span>'+r[1]+'</span>').join('');
+  }
+  updateExplorerSelection([]);
+  renderExplorer();
+}
+function debounceExplorer(){
+  clearTimeout(_explorerDebounce);
+  _explorerDebounce=setTimeout(renderExplorer, 200);
+}
+function explorerPointLabel(p, i){
+  return 'Cell '+(i+1)+'<br>Perturbation: '+(p.pert||'NA')+(p.state?'<br>State: '+p.state:'')+(p.score!=null?'<br>Score: '+fmtNum(Number(p.score)):'');
+}
+function renderExplorer(){
+  if(typeof Plotly==='undefined'){ensurePlotly(renderExplorer);return;}
+  const el=document.getElementById('explorer-chart');
+  if(!el) return;
+  const colorBy=(document.getElementById('explorer-color-by')||{}).value||'perturbation';
+  const geneField=document.getElementById('explorer-gene-field');
+  if(geneField) geneField.style.display=colorBy==='gene'?'block':'none';
+  const focus=(document.getElementById('explorer-pert-filter')||{}).value||'__all__';
+  const ptsAll=D.umap||[];
+  const title=document.getElementById('explorer-title');
+  if(title) title.textContent='UMAP explorer';
+  if(!ptsAll.length){
+    const imgs=D.heatmap_b64||{};
+    const img=imgs.umap_pert||imgs.umap_state;
+    if(img){
+      el.innerHTML='<div style="height:650px;display:flex;align-items:center;justify-content:center;background:#fff;">'
+        +'<img src="'+img+'" alt="UMAP" style="max-width:96%;max-height:620px;object-fit:contain;">'
+        +'</div>';
+    }else{
+      el.innerHTML='<p style="padding:20px;color:var(--muted);">No UMAP coordinates or static UMAP image available.</p>';
+    }
+    updateExplorerSelection([]);
+    return;
+  }
+  const pts=focus==='__all__'?ptsAll:ptsAll.filter(p=>p.pert===focus);
+  const sourceIdx=pts.map(p=>ptsAll.indexOf(p));
+  const traces=[];
+  if(colorBy==='score'){
+    traces.push({type:'scatter',mode:'markers',x:pts.map(p=>p.x),y:pts.map(p=>p.y),
+      text:pts.map((p,i)=>explorerPointLabel(p,sourceIdx[i])),customdata:sourceIdx,
+      hovertemplate:'%{text}<extra></extra>',
+      marker:{color:pts.map(p=>p.score??0),colorscale:'Viridis',showscale:true,size:7,opacity:0.84,
+              colorbar:{title:{text:'Score'}}}});
+  }else if(colorBy==='gene'){
+    const gene=(document.getElementById('explorer-gene-input')||{}).value||((D.umap_genes||[])[0]||'');
+    const vals=(D.umap_gene_expr&&D.umap_gene_expr[gene])||[];
+    traces.push({type:'scatter',mode:'markers',x:pts.map(p=>p.x),y:pts.map(p=>p.y),
+      text:pts.map((p,i)=>explorerPointLabel(p,sourceIdx[i])+'<br>'+gene+': '+fmtNum(Number(vals[sourceIdx[i]]||0))),
+      customdata:sourceIdx,hovertemplate:'%{text}<extra></extra>',
+      marker:{color:sourceIdx.map(i=>vals[i]||0),colorscale:'Viridis',showscale:true,size:7,opacity:0.84,
+              colorbar:{title:{text:gene||'Expression'}}}});
+  }else{
+    const key=colorBy==='state'?'state':'pert';
+    const groups={};
+    pts.forEach((p,i)=>{
+      const g=String(p[key]||'unknown');
+      if(!groups[g]) groups[g]={x:[],y:[],t:[],idx:[]};
+      groups[g].x.push(p.x);groups[g].y.push(p.y);groups[g].t.push(explorerPointLabel(p,sourceIdx[i]));groups[g].idx.push(sourceIdx[i]);
+    });
+    const colors=['#4e79a7','#f28e2b','#59a14f','#e15759','#76b7b2','#edc948','#b07aa1','#ff9da7','#9c755f','#bab0ab'];
+    Object.entries(groups).forEach(([name,g],i)=>{
+      traces.push({type:'scatter',mode:'markers',name,x:g.x,y:g.y,text:g.t,customdata:g.idx,
+        hovertemplate:'%{text}<extra></extra>',
+        marker:{color:colors[i%colors.length],size:7,opacity:0.82,line:{width:0.3,color:'#fff'}}});
+    });
+  }
+  const layout=mkL({
+    dragmode:'lasso',
+    xaxis:{title:{text:'UMAP 1'},zeroline:false,showgrid:false},
+    yaxis:{title:{text:'UMAP 2'},zeroline:false,showgrid:false,scaleanchor:'x',scaleratio:1},
+    margin:{t:20,r:colorBy==='perturbation'||colorBy==='state'?170:80,b:55,l:60},
+    legend:{x:1.02,y:1,bgcolor:'rgba(255,255,255,.88)',bordercolor:'#d7e1ea',borderwidth:1,font:{size:12}}
+  });
+  Plotly.react('explorer-chart',traces,layout,PC).then(gd=>{
+    gd.removeAllListeners('plotly_selected');
+    gd.on('plotly_selected', ev=>{
+      const idx=[];
+      (ev&&ev.points||[]).forEach(pt=>{
+        if(pt.customdata!=null) idx.push(Number(pt.customdata));
+      });
+      updateExplorerSelection(idx);
+    });
+  });
+  updateExplorerSelection([]);
+}
+function updateExplorerSelection(indices){
+  _explorerSelected=indices||[];
+  const pts=(_explorerSelected.length?_explorerSelected.map(i=>D.umap[i]).filter(Boolean):[]);
+  const counts={};
+  pts.forEach(p=>{const k=p.pert||'unknown';counts[k]=(counts[k]||0)+1;});
+  const top=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([k,v])=>k+': '+v).join('<br>')||'None';
+  const el=document.getElementById('explorer-selection-summary');
+  if(el) el.innerHTML=[
+    ['Selected cells',_explorerSelected.length.toLocaleString()],
+    ['Top perturbations',top],
+  ].map(r=>'<span>'+r[0]+'</span><span>'+r[1]+'</span>').join('');
+}
+function openExplorerPerturbation(){
+  const p=(document.getElementById('explorer-pert-filter')||{}).value;
+  const target=(p&&p!=='__all__')?p:Object.keys(D.deg||{})[0];
+  if(!target) return;
+  showTab('pert',null,'tab');
+  if(!_tabInit.pert){_tabInit.pert=true;initPertTab();}
+  const sel=document.getElementById('pert-selector');
+  if(sel&&!Array.from(sel.options).some(o=>o.value===target)) expandPertDropdown();
+  if(sel) sel.value=target;
+  renderPert(target);
+}
+function openExplorerGene(){
+  const gene=(document.getElementById('explorer-gene-input')||{}).value||((D.genes||[])[0]);
+  if(!gene) return;
+  showTab('gene',null,'tab');
+  if(!_tabInit.gene){_tabInit.gene=true;initGeneTab();}
+  renderGeneExpr(gene);
+}
+function downloadExplorerSelection(){
+  if(!_explorerSelected.length) return;
+  const rows=_explorerSelected.map(i=>D.umap[i]).filter(Boolean);
+  const csv=['cell_index,perturbation,cell_state,umap_1,umap_2,perturbation_score']
+    .concat(rows.map((r,j)=>[_explorerSelected[j],r.pert||'',r.state||'',r.x,r.y,r.score??''].map(v=>String(v).replace(/"/g,'""')).map(v=>'"'+v+'"').join(','))).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='perturbflow_selected_cells.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);
+}
+
 /* HOME */
 function renderHome(){
   const s = D.summary;
@@ -1452,7 +1814,7 @@ function renderHome(){
     ' perturbations and '+s.n_genes.toLocaleString()+' measured genes. '+
     (D.deg_summary.length?'DEG analysis was performed on '+D.deg_summary.length+' perturbations. ':'')+
     'Use the tabs above to explore QC, UMAP, heatmaps, per-perturbation DEGs, and gene expression.';
-  const ALL_STEPS=['qc','preprocess','eda','score','effects','trajectory','programs','interaction','state_enrich','deg','genenet','regulatory','report','bundle'];
+  const ALL_STEPS=['qc','preprocess','eda','score','effects','trajectory','programs','interaction','state_enrich','deg','genenet','cscore','regulatory','report','bundle'];
   const done = new Set(D.config._completed_steps||[]);
   document.getElementById('home-steps').innerHTML = ALL_STEPS.map(st=>
     '<span class="step-chip '+(done.has(st)?'done':'')+'">'+( done.has(st)?'\u2713 ':'')+st+'</span>').join('');
@@ -1582,11 +1944,11 @@ function renderUMAP(){
   const hlPert=(document.getElementById('umap-pert-highlight')?.value||'').trim().toLowerCase();
   let traces=[];
   if(colorBy==='score'){
-    traces=[{type:'scattergl',mode:'markers',x:pts.map(p=>p.x),y:pts.map(p=>p.y),
+    traces=[{type:'scatter',mode:'markers',x:pts.map(p=>p.x),y:pts.map(p=>p.y),
       text:pts.map(p=>p.pert),hovertemplate:'%{text}<br>(%{x:.2f},%{y:.2f})<extra></extra>',
       name:'Perturbation score',showlegend:true,
       marker:{color:pts.map(p=>p.score??0),colorscale:'Viridis',showscale:true,size:8,opacity:0.85,
-              colorbar:{title:{text:'Perturbation score',font:{size:14}},tickfont:{size:12},x:1.02}}}}];
+              colorbar:{title:{text:'Perturbation score',font:{size:14}},tickfont:{size:12},x:1.02}}}];
   } else if(colorBy==='gene'){
     let gName=document.getElementById('umap-gene-input').value.trim();
     if(!gName && (D.umap_genes||[]).length){
@@ -1594,7 +1956,7 @@ function renderUMAP(){
       document.getElementById('umap-gene-input').value=gName;
     }
     const gVals=(D.umap_gene_expr&&D.umap_gene_expr[gName])||pts.map(()=>0);
-    traces=[{type:'scattergl',mode:'markers',x:pts.map(p=>p.x),y:pts.map(p=>p.y),
+    traces=[{type:'scatter',mode:'markers',x:pts.map(p=>p.x),y:pts.map(p=>p.y),
       text:pts.map(p=>p.pert),hovertemplate:gName+': %{marker.color:.3f}<br>%{text}<extra></extra>',
       name:gName||'Gene',showlegend:false,
       marker:{color:gVals,colorscale:'Viridis',showscale:true,size:7,opacity:0.85,
@@ -1617,7 +1979,7 @@ function renderUMAP(){
       const notHL=hlPert&&!isHL;
       const isCtrl=!!ctrlKeys[String(grp).toLowerCase()];
       const baseColor=isCtrl?'#9aa0a6':C[i%C.length];
-      traces.push({type:'scattergl',mode:'markers',name:grp,x:g.x,y:g.y,text:g.t,
+      traces.push({type:'scatter',mode:'markers',name:grp,x:g.x,y:g.y,text:g.t,
         hovertemplate:'%{text}<br>(%{x:.2f},%{y:.2f})<extra></extra>',
         marker:{color:notHL?'rgba(160,170,180,.45)':baseColor,
                 size:notHL?6:10, opacity:notHL?0.22:0.85,
@@ -1773,9 +2135,9 @@ function renderPert(pert){
   if(D.umap.length){
     const ga=D.umap.filter(p=>p.pert===pert),gb=D.umap.filter(p=>p.pert!==pert);
     Plotly.react('pert-umap-hl',[
-      {type:'scattergl',mode:'markers',name:'Other',x:gb.map(p=>p.x),y:gb.map(p=>p.y),
+      {type:'scatter',mode:'markers',name:'Other',x:gb.map(p=>p.x),y:gb.map(p=>p.y),
        marker:{color:'#b8c3cf',size:3,opacity:0.35},hoverinfo:'skip'},
-      {type:'scattergl',mode:'markers',name:pert,x:ga.map(p=>p.x),y:ga.map(p=>p.y),
+      {type:'scatter',mode:'markers',name:pert,x:ga.map(p=>p.x),y:ga.map(p=>p.y),
        text:ga.map(p=>p.pert),hovertemplate:'%{text}<extra></extra>',
        marker:{color:'#b04a5a',size:6,opacity:0.9}}],
       mkL({title:{text:'UMAP \u2014 '+pert+' highlighted',font:{size:26}},
@@ -1783,6 +2145,17 @@ function renderPert(pert){
            yaxis:{title:{text:'UMAP 2',font:{size:22}},zeroline:false,showgrid:false,linecolor:'#4c5f70',ticks:'outside',tickfont:{size:18}},
            height:500,autosize:true,
            showlegend:true,legend:{font:{size:14},bgcolor:'rgba(255,255,255,0.85)',bordercolor:'#888',borderwidth:1}}),PC);
+  } else {
+    const uel=document.getElementById('pert-umap-hl');
+    const img=D.heatmap_b64.umap_pert||D.heatmap_b64.umap_state;
+    try{Plotly.purge('pert-umap-hl');}catch(e){}
+    if(img){
+      uel.innerHTML='<div style="height:500px;display:flex;align-items:center;justify-content:center;background:#fff;">'
+        +'<img src="'+img+'" alt="UMAP" style="max-width:100%;max-height:480px;object-fit:contain;">'
+        +'</div>';
+    } else {
+      uel.innerHTML='<p style="padding:16px;color:var(--muted);">No UMAP coordinates or static UMAP image available.</p>';
+    }
   }
   // top DEG bar
   reRenderDegBar();
@@ -2108,6 +2481,7 @@ function downloadEffectPng() {
 function renderStateEnrich() {
   const se = D.state_enrich;
   const el = document.getElementById('states-heatmap-chart');
+  if (!el) return;
   if (!se || !se.perturbations || !se.perturbations.length) {
     el.innerHTML = '<p style="padding:20px;color:var(--muted);">No cell state enrichment data. Run the state_enrich step.</p>';
     return;
@@ -2119,6 +2493,10 @@ function renderStateEnrich() {
   ).filter(i => i >= 0);
   const perts = idxKeep.map(i => se.perturbations[i]);
   const zRows = idxKeep.map(i => se.matrix[i]);
+  if (!zRows.length) {
+    el.innerHTML = '<p style="padding:20px;color:var(--muted);">No perturbations pass the current minimum signal filter.</p>';
+    return;
+  }
   const vmax = Math.min(Math.max(...zRows.flat().map(Math.abs), 1), 6);
   const ht = Math.max(380, perts.length * 18 + 80);
   el.style.height = ht + 'px';
@@ -2356,10 +2734,15 @@ function renderCscoreEdges(pert, geneFilter) {
     ? edges.filter(e => e.gene_A === geneFilter || e.gene_B === geneFilter)
     : edges;
 
-  // Scatter: ctrl_r vs pert_r, coloured by status
+  // Scatter: ctrl_r vs pert_r, coloured by status. Large C-score runs can
+  // contain tens of thousands of edges per perturbation, so the scatter uses
+  // the strongest edges by |delta_r| while the CSV files retain the full table.
+  const plotEdges = shownEdges.length > 5000
+    ? [...shownEdges].sort((a, b) => Math.abs(b.delta_r || 0) - Math.abs(a.delta_r || 0)).slice(0, 5000)
+    : shownEdges;
   const colMap = {gained: '#2dc653', lost: '#e63946', shared: '#9aa7b4'};
   const groups = {};
-  shownEdges.forEach(e => {
+  plotEdges.forEach(e => {
     const g = e.status || 'shared';
     if (!groups[g]) groups[g] = {x: [], y: [], t: []};
     groups[g].x.push(e.ctrl_r);
@@ -2373,8 +2756,15 @@ function renderCscoreEdges(pert, geneFilter) {
     marker: {color: colMap[status] || '#888', size: 7, opacity: 0.75},
   }));
   // Diagonal guide
-  const allR = shownEdges.flatMap(e => [e.ctrl_r, e.pert_r]).filter(v => v != null);
-  const rmin = Math.min(...allR, -0.2), rmax = Math.max(...allR, 0.2);
+  let rmin = -0.2, rmax = 0.2;
+  plotEdges.forEach(e => {
+    [e.ctrl_r, e.pert_r].forEach(v => {
+      if (v == null || !Number.isFinite(Number(v))) return;
+      v = Number(v);
+      if (v < rmin) rmin = v;
+      if (v > rmax) rmax = v;
+    });
+  });
   traces.push({
     type: 'scatter', mode: 'lines', name: 'No change',
     x: [rmin, rmax], y: [rmin, rmax],
@@ -2382,8 +2772,9 @@ function renderCscoreEdges(pert, geneFilter) {
   });
   const cStr = summary.c_total != null ? (' \u2014 C_total\u202f=\u202f' + (summary.c_total).toFixed(3)) : '';
   const gStr = geneFilter && geneFilter !== '__all__' ? (' \u2014 ' + geneFilter) : '';
+  const capStr = plotEdges.length < shownEdges.length ? (' \u2014 showing top ' + plotEdges.length.toLocaleString() + ' of ' + shownEdges.length.toLocaleString() + ' edges by |\u0394r|') : '';
   Plotly.react('cscore-edge-scatter', traces, mkL({
-    title: {text: 'Edge weights: ctrl vs pert \u2014 ' + pert + gStr + cStr, font: {size: 17}},
+    title: {text: 'Edge weights: ctrl vs pert \u2014 ' + pert + gStr + cStr + capStr, font: {size: 17}},
     xaxis: {title: {text: 'Control Pearson r', font: {size: 14}}, zeroline: true, zerolinecolor: '#ccc'},
     yaxis: {title: {text: 'Perturbation Pearson r', font: {size: 14}}, zeroline: true, zerolinecolor: '#ccc'},
     showlegend: true, legend: {font: {size: 13}},
@@ -2442,8 +2833,8 @@ document.addEventListener('DOMContentLoaded',()=>{
     document.getElementById('home-analysis-text').textContent='Loading interactive report data...';
     loadReportData().then(()=>{
       buildSidebarPerts('');buildSidebarGenes('');
-      _tabInit['home']=true;
-      requestAnimationFrame(()=>{try{renderHome();}catch(e){showStartupError(e);}});
+      _tabInit['explorer']=true;
+      requestAnimationFrame(()=>{try{ensurePlotly(initExplorerTab);}catch(e){showStartupError(e);}});
     }).catch(()=>{});
   }catch(e){showStartupError(e);}
 });
@@ -2479,9 +2870,9 @@ def build_interactive_report(
     json_str = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
     data_path = out / "interactive_data.json"
     data_path.write_text(json_str, encoding="utf-8")
-    html = template.replace("{DATA_STUB}", json_str)
+    plotly_js = _copy_plotly_bundle(out)
+    html = template.replace("{DATA_STUB}", json_str).replace("{PLOTLY_STUB}", plotly_js)
 
     out_path = out / "interactive_report.html"
     out_path.write_text(html, encoding="utf-8")
-    _copy_plotly_bundle(out)
     return out_path

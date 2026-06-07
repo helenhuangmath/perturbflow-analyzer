@@ -25,6 +25,9 @@
     "score",
     "effects",
     "deg",
+    "genenet",
+    "cscore",
+    "regulatory",
     "report",
     "bundle"
   ]
