@@ -14,7 +14,7 @@ distinguishes perturbations that *amplify* existing transcriptional programs
 from those that *reorganize* regulatory relationships — interpretable signal
 that prediction-accuracy metrics alone miss.
 
-The project is organized around three aims (see [`docs/ROADMAP.md`](docs/ROADMAP.md)):
+The project is organized around three aims:
 
 1. **Community-standard infrastructure** — stable AnnData schemas, reproducible
    workflows, interactive reports, reference datasets, and interoperable APIs.
@@ -27,8 +27,7 @@ The current release ships the `perturbflow.analyzer` subpackage for QC,
 perturbation scoring, differential expression, trajectory effects, gene-network
 rewiring, regulatory analysis, interactive reports, and structured
 interpretation handoff. The `perturbflow.predictor` and `perturbflow.benchmark`
-namespaces are reserved for the prediction (Aim 2) and benchmarking (Aim 3)
-work on the roadmap.
+namespaces are reserved for Aim 2 prediction and Aim 3 benchmarking.
 
 ## What PerturbFlow Produces
 
@@ -233,8 +232,6 @@ perturbflow/
 ├── examples/             # Notebook templates for common workflows
 ├── scripts/              # Companion scripts, including Seurat/Mixscape
 ├── docs/                 # MkDocs documentation site
-├── docs/ROADMAP.md       # Aims, milestones, and status
-├── docs/CONTRIBUTING.md
 ├── README.md
 ├── docs/QUICK_START.md
 ├── docs/METHOD.md
@@ -244,8 +241,6 @@ perturbflow/
 
 ## Project Documents
 
-- [`docs/ROADMAP.md`](docs/ROADMAP.md) — aims mapped to concrete work and status.
-- [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) — how to get involved.
 - [`docs/DESIGN.md`](docs/DESIGN.md) / [`docs/METHOD.md`](docs/METHOD.md) — architecture and methods.
 
 ## Web Documentation

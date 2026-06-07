@@ -8,13 +8,13 @@ It standardizes data representation, reproducible workflows, mechanistic
 (rewiring-aware) interpretation, and structured outputs, and complements the
 scverse ecosystem rather than replacing it.
 
-The project is organized around three aims — community-standard infrastructure,
+The project is organized around three aims: community-standard infrastructure,
 model-ready perturbation biology, and community benchmarks. See the
-[Vision and Roadmap](vision.md) for details.
+[Vision](vision.md) page for details.
 
 The current release ships an analyzer workflow for AnnData input, interactive
 reports, and structured interpretation files. The `predictor` and `benchmark`
-namespaces are reserved for the prediction and evaluation work on the roadmap.
+namespaces are reserved for prediction and evaluation work.
 
 ## Core Workflow
 

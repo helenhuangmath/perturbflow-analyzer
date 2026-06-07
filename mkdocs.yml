@@ -9,7 +9,7 @@ theme:
     - content.code.copy
 nav:
   - Home: index.md
-  - Vision and Roadmap: vision.md
+  - Vision: vision.md
   - Quick Start: quickstart.md
   - Data Input: data-input.md
   - Analysis Workflow: workflow.md

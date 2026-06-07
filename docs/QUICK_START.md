@@ -1,8 +1,7 @@
 # PerturbFlow Quick Start
 
-PerturbFlow is open, AnnData-native infrastructure for perturbation biology
-(see [`ROADMAP.md`](ROADMAP.md)). The current `analyzer`
-subpackage standardizes perturbation labels, runs QC, scoring, DEG, network,
+PerturbFlow is open, AnnData-native infrastructure for perturbation biology.
+The current `analyzer` subpackage standardizes perturbation labels, runs QC, scoring, DEG, network,
 regulatory, C-score, and report steps, then writes an interactive HTML report
 plus a viewer-ready results bundle.
 

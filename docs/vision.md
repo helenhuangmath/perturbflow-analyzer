@@ -1,4 +1,4 @@
-# Vision and Roadmap
+# Vision
 
 PerturbFlow is **open infrastructure for perturbation biology**. Rather than
 being one more standalone analysis method, it standardizes how perturbation data
@@ -40,5 +40,4 @@ of improvement are measured against honest baselines.
 ## Where the project stands
 
 PerturbFlow has been applied to large-scale public Perturb-seq datasets and is
-in active development. The full status table mapping aims to concrete work lives
-in [`ROADMAP.md`](https://github.com/helenhuangmath/PerturbFlow/blob/main/docs/ROADMAP.md).
+in active development.
