@@ -192,7 +192,7 @@ effect into
 total = bulk + state-conditional + interaction + residual
 ```
 
-(see [`perturbflow/analyzer/state.py`](perturbflow/analyzer/state.py)). The bar plot
+(see [`perturbflow/analyzer/state.py`](https://github.com/helenhuangmath/PerturbFlow/blob/main/perturbflow/analyzer/state.py)). The bar plot
 ranks perturbations by total effect size; the CSV is the data behind
 it.
 

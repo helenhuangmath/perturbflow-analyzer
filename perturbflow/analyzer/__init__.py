@@ -1,6 +1,6 @@
 """PerturbFlow Analyzer: state-aware Perturb-seq analysis engine."""
 
-__version__ = "1.0.0"
+__version__ = "0.1.0"
 
 __all__ = ["PipelineConfig", "run_pipeline"]
 

@@ -17,6 +17,7 @@ nav:
   - Interpretation Handoff: ai-agents.md
   - Outputs: outputs.md
   - Methods: methods.md
+  - Release Notes: release-notes.md
   - GitHub Setup: github.md
 markdown_extensions:
   - admonition

@@ -6,7 +6,7 @@ publication-style "Methods" companion of `DESIGN.md` (which describes the
 software architecture). For each step we state the inputs, the algorithm,
 the parameters that are exposed in the JSON config, and where the
 artefacts land on disk. The pipeline is wired in
-[`perturbflow/analyzer/pipeline.py`](perturbflow/analyzer/pipeline.py); each step lives in
+[`perturbflow/analyzer/pipeline.py`](https://github.com/helenhuangmath/PerturbFlow/blob/main/perturbflow/analyzer/pipeline.py); each step lives in
 its own module under `perturbflow/analyzer/`.
 
 > **Scope of this document.** Below we cover the gene co-expression /
@@ -19,11 +19,11 @@ its own module under `perturbflow/analyzer/`.
 
 ## Gene co-expression / regulatory network (GRN) step
 
-**Module:** [`perturbflow/analyzer/genenet.py`](perturbflow/analyzer/genenet.py)
+**Module:** [`perturbflow/analyzer/genenet.py`](https://github.com/helenhuangmath/PerturbFlow/blob/main/perturbflow/analyzer/genenet.py)
 **Public entry point:** `run_gene_network(adata, output_dir, perturbations, n_top_genes, n_gene_clusters, corr_threshold)`
-**Pipeline call site:** [`perturbflow/analyzer/pipeline.py:204-217`](perturbflow/analyzer/pipeline.py#L204-L217)
+**Pipeline call site:** [`perturbflow/analyzer/pipeline.py:204-217`](https://github.com/helenhuangmath/PerturbFlow/blob/main/perturbflow/analyzer/pipeline.py#L204-L217)
 **Step name (for `--steps` / `default_steps`):** `genenet`
-**Test config:** `genenet_n_top_genes=30`, `genenet_n_gene_clusters=4`, `genenet_corr_threshold=0.4` (see [`configs/test.json`](configs/test.json)).
+**Test config:** `genenet_n_top_genes=30`, `genenet_n_gene_clusters=4`, `genenet_corr_threshold=0.4` (see [`configs/test.json`](https://github.com/helenhuangmath/PerturbFlow/blob/main/configs/test.json)).
 
 ### 1. Inputs and assumptions
 
@@ -33,7 +33,7 @@ its own module under `perturbflow/analyzer/`.
 | `adata.obs["perturbation"]` | string column | One row per cell; `control` is reserved for the unperturbed pool. |
 | `adata.obs["is_control"]` | boolean | Set by `qc` / `preprocess`. Identifies the cells used as the control pool. |
 | `adata.var["highly_variable"]` | boolean (optional) | If present, the gene panel is taken from this flag; otherwise we fall back to top variance over control cells (see §2). |
-| `top_perts` (parameter) | from [`identify_top_perturbations`](perturbflow/analyzer/perturbation.py) | The `n_top` perturbations ranked by the `effects` step's effect-size table. The test run uses `deg_n_top_perturbations = 3`. |
+| `top_perts` (parameter) | from [`identify_top_perturbations`](https://github.com/helenhuangmath/PerturbFlow/blob/main/perturbflow/analyzer/perturbation.py) | The `n_top` perturbations ranked by the `effects` step's effect-size table. The test run uses `deg_n_top_perturbations = 3`. |
 
 The GRN step requires **≥ 5 control cells and ≥ 5 cells per perturbation**; smaller groups are skipped with no error.
 
@@ -59,7 +59,7 @@ gene_names = adata.var_names[hv_idx].tolist()    # length = n_top_genes
 
 A single set of gene modules is fitted on the **control** correlation
 matrix and reused in all panels (so the same gene has the same module
-colour everywhere) ([`genenet.py:548-554`](perturbflow/analyzer/genenet.py#L548-L554)):
+colour everywhere) ([`genenet.py:548-554`](https://github.com/helenhuangmath/PerturbFlow/blob/main/perturbflow/analyzer/genenet.py#L548-L554)):
 
 ```python
 ctrl_expr = _to_dense(adata.X[ctrl_mask, :][:, hv_idx])      # (n_ctrl_cells, n_genes)
@@ -79,7 +79,7 @@ cluster_labels = fcluster(Z, t=n_gene_clusters,
 
 For each condition (control + each top perturbation) we compute a fresh
 gene–gene Pearson correlation matrix on the cells of that condition,
-then build an undirected `networkx.Graph` ([`genenet.py:104-121`](perturbflow/analyzer/genenet.py#L104-L121)):
+then build an undirected `networkx.Graph` ([`genenet.py:104-121`](https://github.com/helenhuangmath/PerturbFlow/blob/main/perturbflow/analyzer/genenet.py#L104-L121)):
 
 ```python
 def _build_network(corr, gene_names, threshold):
@@ -104,7 +104,7 @@ def _build_network(corr, gene_names, threshold):
 To keep gene positions comparable across the three panels of a
 perturbation (control / perturbation / differential), the layout is
 computed **once** on the union of edges and reused
-([`genenet.py:325-329`](perturbflow/analyzer/genenet.py#L325-L329)):
+([`genenet.py:325-329`](https://github.com/helenhuangmath/PerturbFlow/blob/main/perturbflow/analyzer/genenet.py#L325-L329)):
 
 ```python
 G_union = nx.Graph()
@@ -125,7 +125,7 @@ pos = nx.spring_layout(G_union,
 ### 6. Differential network — edge-set difference
 
 The differential graph is built directly from the two edge sets
-([`genenet.py:341-355`](perturbflow/analyzer/genenet.py#L341-L355)):
+([`genenet.py:341-355`](https://github.com/helenhuangmath/PerturbFlow/blob/main/perturbflow/analyzer/genenet.py#L341-L355)):
 
 ```python
 ctrl_edges = {tuple(sorted((u, v))) for u, v in G_ctrl.edges()}
@@ -190,7 +190,7 @@ csv/
                                           consumed by the interactive HTML report.
 ```
 
-The interactive report ([`perturbflow/analyzer/interactive.py`](perturbflow/analyzer/interactive.py)) base64-embeds the three per-perturbation networks side-by-side in row 1 of the *Gene Network* tab, and the `control_heatmap` + `<p>_heatmap_comparison` heatmaps in row 2.
+The interactive report ([`perturbflow/analyzer/interactive.py`](https://github.com/helenhuangmath/PerturbFlow/blob/main/perturbflow/analyzer/interactive.py)) base64-embeds the three per-perturbation networks side-by-side in row 1 of the *Gene Network* tab, and the `control_heatmap` + `<p>_heatmap_comparison` heatmaps in row 2.
 
 ### 9. Parameters and defaults
 
@@ -238,7 +238,7 @@ perturbation must have ≥ 5 cells, otherwise the perturbation is skipped.
   matched random subsample of cells) and report each edge's empirical
   rank, so the threshold becomes data-driven rather than `0.4` fixed.
 * **TF–TF regulatory view.** The
-  [`perturbflow/analyzer/regulatory.py`](perturbflow/analyzer/regulatory.py) module
+  [`perturbflow/analyzer/regulatory.py`](https://github.com/helenhuangmath/PerturbFlow/blob/main/perturbflow/analyzer/regulatory.py) module
   already produces a directed TF→target network from perturbation
   effect sizes; surfacing its output alongside the co-expression
   network would give a "phenotypic vs mechanistic" pair of views per
