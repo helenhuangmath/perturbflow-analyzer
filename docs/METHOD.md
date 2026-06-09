@@ -1,19 +1,13 @@
 # PerturbFlow Analyzer — Methods
 
 This file documents the analysis methods that PerturbFlow Analyzer runs on a
-Perturb-seq / CRISPR-screen `AnnData`. It is meant to be the
+Perturb-seq `AnnData`. It is meant to be the
 publication-style "Methods" companion of `DESIGN.md` (which describes the
 software architecture). For each step we state the inputs, the algorithm,
 the parameters that are exposed in the JSON config, and where the
 artefacts land on disk. The pipeline is wired in
 [`perturbflow/analyzer/pipeline.py`](https://github.com/helenhuangmath/PerturbFlow/blob/main/perturbflow/analyzer/pipeline.py); each step lives in
 its own module under `perturbflow/analyzer/`.
-
-> **Scope of this document.** Below we cover the gene co-expression /
-> gene regulatory network (GRN) step in detail, because it is the most
-> involved single-step analysis in the package. The other steps (QC,
-> preprocessing, EDA, DEG, etc.) are described at a high level in
-> `DESIGN.md` and `README.md`.
 
 ---
 

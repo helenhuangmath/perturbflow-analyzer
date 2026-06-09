@@ -15,7 +15,7 @@
 #                          refined later by the scoring module)
 #
 # Guaranteed .uns keys:
-#   perturbscope_version       -- version string
+#   perturbflow_version        -- version string
 #   perturbation_targets       -- sorted list of all perturbation labels
 #   n_cells_per_perturbation   -- dict mapping label -> cell count
 # =============================================================================
@@ -124,7 +124,7 @@ def standardize_adata(adata, perturbation_col: Optional[str] = None):
 
     # Step 5: store dataset-level metadata in .uns for traceability.
     targets = sorted(pd.Series(adata.obs["perturbation"]).astype(str).unique().tolist())
-    adata.uns["perturbscope_version"] = __version__
+    adata.uns["perturbflow_version"] = __version__
     adata.uns["perturbation_targets"] = targets
     adata.uns["n_cells_per_perturbation"] = (
         adata.obs["perturbation"].value_counts().to_dict()

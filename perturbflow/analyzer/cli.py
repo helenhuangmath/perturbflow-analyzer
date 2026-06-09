@@ -3,8 +3,7 @@
 #
 # Command-line interface for PerturbFlow Analyzer.
 #
-# Entry point:  perturbflow analyzer  (or the legacy `perturbscope` script
-#               after `pip install -e .`)
+# Entry point:  perturbflow analyzer
 #
 # Subcommands:
 #   run         -- Run the full pipeline or a subset of steps.

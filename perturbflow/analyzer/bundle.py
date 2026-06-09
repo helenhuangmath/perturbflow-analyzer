@@ -262,7 +262,7 @@ def _build_tf_network(adata, de_tables: dict) -> dict:
                     "target": t,
                     "weight": 1.0,
                     "mean_log2fc": mean_lfc,
-                    "source": "perturbscope_builtin_prior",
+                    "source": "perturbflow_builtin_prior",
                 }
             )
 
@@ -464,7 +464,7 @@ def emit_bundle(
     # ---- manifest ---------------------------------------------------------
     manifest = {
         "schema_version": schema_version,
-        "perturbscope_version": __version__,
+        "perturbflow_version": __version__,
         "created_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "format": "parquet" if use_parquet else "csv",
         "artifacts": {

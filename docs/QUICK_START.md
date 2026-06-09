@@ -16,7 +16,7 @@ On the Wherry cluster, use the existing environment:
 
 ```bash
 source /vast/parcc/spack/sw/apps/linux-sapphirerapids/anaconda3-2023.09-0-ieilyrkph5mewqcum3ajc4odlt2vakri/etc/profile.d/conda.sh
-conda activate /vast/projects/wherry/foundation-models-immuno/hhua/tools/perturbscope_env
+conda activate /vast/projects/wherry/foundation-models-immuno/hhua/tools/perturbflow_env
 python -m pip install -e /vast/projects/wherry/foundation-models-immuno/hhua/sc_perturbation/PerturbFlow --no-deps
 ```
 

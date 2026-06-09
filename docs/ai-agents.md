@@ -1,9 +1,9 @@
-# Interpretation Handoff
+# Agent Interpretation
 
 PerturbFlow is designed to package analysis outputs for structured downstream
 review without making hidden network calls.
 
-## Export Interpretation Context
+## Export Agent Interpretation Context
 
 ```bash
 perturbflow interpret --results results/my_run --project-name "My screen"
@@ -29,6 +29,6 @@ agent_handoff/
 
 ## Privacy
 
-The handoff exporter summarizes derived tables and report artifacts. It does not
-include raw count matrices. Review the files before sharing them outside your
-analysis environment.
+The agent interpretation exporter summarizes derived tables and report
+artifacts. It does not include raw count matrices. Review the files before
+sharing them outside your analysis environment.

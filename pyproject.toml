@@ -52,8 +52,7 @@ Issues = "https://github.com/helenhuangmath/PerturbFlow/issues"
 
 [project.scripts]
 perturbflow = "perturbflow.cli:main"
-perturbscope = "perturbflow.analyzer.cli:main"
-perturbscope-prepare = "perturbflow.analyzer.process_data:main"
+perturbflow-prepare = "perturbflow.analyzer.process_data:main"
 
 [tool.setuptools]
 

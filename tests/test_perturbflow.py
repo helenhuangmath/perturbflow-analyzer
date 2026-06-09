@@ -73,5 +73,5 @@ def test_agent_handoff_writes_expected_files(tmp_path: Path) -> None:
     assert Path(files["machine_context"]).exists()
     assert Path(files["agent_manifest"]).exists()
     text = Path(files["interpretation_context"]).read_text(encoding="utf-8")
-    assert "Test interpretation context" in text
+    assert "Test agent interpretation context" in text
     assert "GENE1" in text

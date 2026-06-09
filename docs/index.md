@@ -13,7 +13,7 @@ model-ready perturbation biology, and community benchmarks. See the
 [Vision](vision.md) page for details.
 
 The current release ships an analyzer workflow for AnnData input, interactive
-reports, and structured interpretation files. The `predictor` and `benchmark`
+reports, and agent interpretation files. The `predictor` and `benchmark`
 namespaces are reserved for prediction and evaluation work.
 
 ## Core Workflow
@@ -32,6 +32,6 @@ perturbflow interpret --results results/run1 --project-name "My Perturb-seq scre
 - Cell-state and trajectory effects.
 - Gene-network and TF-network rewiring.
 - Static and interactive HTML reports.
-- Structured handoff files for downstream interpretation.
+- Agent interpretation files for downstream review.
 
-PerturbFlow prepares interpretation context, but it does not upload data automatically.
+PerturbFlow prepares agent interpretation context, but it does not upload data automatically.

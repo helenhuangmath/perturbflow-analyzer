@@ -14,7 +14,7 @@ nav:
   - Data Input: data-input.md
   - Analysis Workflow: workflow.md
   - Examples: examples.md
-  - Interpretation Handoff: ai-agents.md
+  - Agent Interpretation: ai-agents.md
   - Outputs: outputs.md
   - Methods: methods.md
   - Release Notes: release-notes.md

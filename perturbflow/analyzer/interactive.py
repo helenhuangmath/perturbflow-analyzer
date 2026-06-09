@@ -789,8 +789,8 @@ def _plotly_bundle_source() -> Path | None:
     except Exception:
         pass
     candidates.extend([
-        Path("/vast/projects/wherry/foundation-models-immuno/hhua/tools/perturbscope_env/lib/python3.10/site-packages/plotly/package_data/plotly.min.js"),
-        Path("/vast/projects/wherry/foundation-models-immuno/hhua/tools/perturbscope_env/lib/python3.12/site-packages/plotly/package_data/plotly.min.js"),
+        Path("/vast/projects/wherry/foundation-models-immuno/hhua/tools/perturbflow_env/lib/python3.10/site-packages/plotly/package_data/plotly.min.js"),
+        Path("/vast/projects/wherry/foundation-models-immuno/hhua/tools/perturbflow_env/lib/python3.12/site-packages/plotly/package_data/plotly.min.js"),
     ])
     for src in candidates:
         if src.exists():

@@ -103,7 +103,7 @@ def build_interpretation_markdown(context: dict[str, Any], project_name: str = "
     bundle_manifest = context.get("bundle_manifest") or {}
 
     lines = [
-        f"# {project_name} interpretation context",
+        f"# {project_name} agent interpretation context",
         "",
         "This file is designed for a human analyst to interpret a completed PerturbFlow run.",
         "It summarizes derived tables and report artifacts; it does not include raw count matrices.",
@@ -157,7 +157,7 @@ def build_agent_prompt(project_name: str = "PerturbFlow run") -> str:
     """Return a reusable analysis prompt."""
     return f"""You are a careful single-cell perturbation analysis assistant.
 
-Use the attached `{project_name} interpretation context` and the linked PerturbFlow result artifacts to write a scientist-facing interpretation.
+Use the attached `{project_name} agent interpretation context` and the linked PerturbFlow result artifacts to write a scientist-facing interpretation.
 
 Requirements:
 - Separate strong findings from hypotheses.

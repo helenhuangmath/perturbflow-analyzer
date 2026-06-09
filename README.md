@@ -1,33 +1,28 @@
-# PerturbFlow
-
-**Open infrastructure for perturbation biology.**
+# PerturbFlow: An Open Platform for Single Cell Perturbation 
 
 PerturbFlow is an open-source, AnnData-native platform that provides a unified
-infrastructure layer for perturbation experiments — Perturb-seq, pooled CRISPR
-screens, and single-cell multi-omics. Rather than being one more standalone
-analysis method, it standardizes data representation, reproducible workflows,
-mechanistic interpretation, and structured outputs, and complements the scverse
-ecosystem rather than replacing it.
-
-A distinctive capability is **rewiring-aware interpretation**: PerturbFlow
-distinguishes perturbations that *amplify* existing transcriptional programs
-from those that *reorganize* regulatory relationships — interpretable signal
-that prediction-accuracy metrics alone miss.
-
-The project is organized around three aims:
-
-1. **Community-standard infrastructure** — stable AnnData schemas, reproducible
-   workflows, interactive reports, reference datasets, and interoperable APIs.
-2. **Model-ready perturbation biology** — standardized exports, scalable
-   processing, and interfaces for workflow managers.
-3. **Community benchmarks** — baseline-calibrated, distance-aware, and
-   rewiring-aware evaluation with reproducible benchmarking workflows.
+infrastructure layer for perturbation experiments including Perturb-seq, pooled CRISPR
+screens, and single-cell multi-omics. It supports Perturb-seq, pooled CRISPR screens, and multimodal perturbation experiments through standardized data ingestion, quality control, perturbation-aware analysis, mechanistic interpretation, interactive reporting, and structured exports. 
 
 The current release ships the `perturbflow.analyzer` subpackage for QC,
 perturbation scoring, differential expression, trajectory effects, gene-network
 rewiring, regulatory analysis, interactive reports, and structured
-interpretation handoff. The `perturbflow.predictor` and `perturbflow.benchmark`
+agent interpretation. The `perturbflow.predictor` and `perturbflow.benchmark`
 namespaces are reserved for Aim 2 prediction and Aim 3 benchmarking.
+
+## Modes
+
+PerturbFlow is organized into four modes:
+
+- **Analyzer**: processes perturbation datasets, runs QC and downstream biology
+  analyses, builds gene-network and regulatory summaries, and generates reports.
+- **Predictor**: supports perturbation-response prediction workflows and
+  model-ready data exports.
+- **Benchmarker**: supports reproducible comparison of perturbation models and
+  analysis methods using baseline-aware and rewiring-aware outputs.
+- **AI**: exports agent interpretation context so downstream AI tools can
+  summarize results, compare runs, and review findings without requiring access
+  to raw count matrices.
 
 ## What PerturbFlow Produces
 
@@ -123,7 +118,7 @@ Open the main report:
 results/my_run/interactive_report.html
 ```
 
-Create the structured interpretation handoff:
+Create the agent interpretation package:
 
 ```bash
 perturbflow interpret \
@@ -139,6 +134,61 @@ results/my_run/agent_handoff/
 ├── agent_prompt.md
 ├── interpretation_context.md
 └── machine_context.json
+```
+
+Example `interpretation_context.md` excerpt:
+
+```markdown
+# K562 essential gene Perturb-seq interpretation context
+
+This file summarizes derived tables and report artifacts; it does not include
+raw count matrices.
+
+## Dataset overview
+
+- Results directory: `results/my_run`
+- Cells: 360
+- Genes: 1000
+- Perturbations: 6
+- Completed steps: qc, preprocess, deg, genenet, cscore, regulatory, report, bundle
+- Bundle schema: 1.0
+
+## Top differential-expression perturbations
+
+| perturbation | n_de_total | n_de_up | n_de_down | top_up_gene | top_down_gene |
+| --- | --- | --- | --- | --- | --- |
+| ATF4 | 148 | 81 | 67 | DDIT3 | RPLP1 |
+| DDIT3 | 121 | 62 | 59 | PPP1R15A | RPS12 |
+
+## Strongest connectivity rewiring signals
+
+| perturbation | c_total | c_gain | c_loss | c_shift |
+| --- | --- | --- | --- | --- |
+| ATF4 | 0.42 | 0.25 | 0.17 | 0.31 |
+```
+
+Example `machine_context.json` excerpt:
+
+```json
+{
+  "project_name": "K562 essential gene Perturb-seq",
+  "results_dir": "results/my_run",
+  "deg_top": [
+    {
+      "perturbation": "ATF4",
+      "n_de_total": "148",
+      "top_up_gene": "DDIT3"
+    }
+  ],
+  "cscore_top": [
+    {
+      "perturbation": "ATF4",
+      "c_total": "0.42",
+      "c_gain": "0.25",
+      "c_loss": "0.17"
+    }
+  ]
+}
 ```
 
 Review these files before sharing them outside your analysis environment.
@@ -165,11 +215,9 @@ perturbflow analyze      # Alias for analyzer
 perturbflow run          # Legacy alias for analyzer
 perturbflow predict      # Reserved for future predictor features (Aim 2)
 perturbflow benchmark    # Reserved for community evaluation tooling (Aim 3)
-perturbflow interpret    # Export structured interpretation context
+perturbflow interpret    # Export agent interpretation context
 perturbflow list-steps   # Show available pipeline steps
 ```
-
-The historical `perturbscope` command remains available for compatibility.
 
 ## Python API
 
@@ -220,23 +268,12 @@ perturbflow analyzer --input prepared/my_data.perturbflow.h5ad --output results/
 ## Repository Layout
 
 ```text
-perturbflow/
-├── perturbflow/          # Public package namespace and CLI
-├── perturbflow/analyzer/ # Current analysis engine
-├── perturbflow/data/     # Data preparation namespace
-├── perturbflow/predictor/ # Reserved prediction namespace (Aim 2)
-├── perturbflow/benchmark/ # Reserved benchmarking namespace (Aim 3)
-├── perturbflow/workflows/ # End-to-end workflow namespace
-├── perturbflow/viz/      # Visualization/reporting namespace
-├── configs/              # Default and test pipeline configs
-├── examples/             # Notebook templates for common workflows
-├── scripts/              # Companion scripts, including Seurat/Mixscape
-├── docs/                 # MkDocs documentation site
-├── README.md
-├── docs/QUICK_START.md
-├── docs/METHOD.md
-├── docs/RESULT.md
-└── pyproject.toml
+perturbflow/   # Python package, CLI, Analyzer, Predictor, Benchmarker, and AI APIs
+configs/       # Example pipeline configurations
+examples/      # Example data and workflows
+docs/          # Documentation and design notes
+scripts/       # Companion scripts
+tests/         # Test suite
 ```
 
 ## Project Documents
@@ -260,13 +297,13 @@ Notebook templates are available in [`examples/`](examples/):
 
 - `01_prepare_and_run.ipynb`: prepare data and run the full pipeline.
 - `02_step_rerun_and_config.ipynb`: customize config and rerun selected steps.
-- `03_interpret_with_agents.ipynb`: create structured interpretation files.
+- `03_interpret_with_agents.ipynb`: create agent interpretation files.
 - `04_explore_outputs.ipynb`: inspect result tables, reports, and bundles.
 
-## Interpretation Handoff
+## Agent Interpretation
 
 PerturbFlow does not send data to any external service automatically. Instead,
-`perturbflow interpret` creates a compact handoff package with:
+`perturbflow interpret` creates a compact agent interpretation package with:
 
 - A human-readable interpretation context.
 - A reusable analysis prompt.
